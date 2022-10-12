@@ -28,7 +28,7 @@ jobs:
         run: cmake --build build --config ${{ matrix.config }}
 
       - name: Install
-        run: cmake --install build --config ${{ matrix.config }}
+        run: sudo cmake --install build --config ${{ matrix.config }}
 
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
