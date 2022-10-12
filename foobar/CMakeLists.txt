@@ -3,6 +3,7 @@ add_library(foobar MODULE foobar.c)
 target_link_libraries(foobar PostgreSQL::PostgreSQL)
 install(TARGETS foobar LIBRARY DESTINATION ${PostgreSQL_PKG_LIBRARY_DIR})
 
+# Inject version number into .control file
 configure_file(foobar.control foobar.control)
 install(
   FILES
