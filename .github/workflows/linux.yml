@@ -13,6 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install PostgreSQL server headers
+        run: |
+          sudo apt update
+          sudo apt-get install postgresql-server-dev-14 postgis
+
       - name: Configure PATH
         run: echo "$PGBIN" >> $GITHUB_PATH
 
