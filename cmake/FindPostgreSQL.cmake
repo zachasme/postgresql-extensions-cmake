@@ -42,11 +42,6 @@ execute_process(COMMAND ${_PG_CONFIG} --pkglibdir         OUTPUT_STRIP_TRAILING_
 execute_process(COMMAND ${_PG_CONFIG} --sharedir          OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_SHARE_DIR)
 execute_process(COMMAND ${_PG_CONFIG} --includedir-server OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIRECTORY_SERVER)
 
-message(STATUS "pg_config at ${_PG_CONFIG}")
-message(STATUS "@@@ PKG_LIBRARY_DIR: ${PostgreSQL_PKG_LIBRARY_DIR}")
-message(STATUS "@@@ SHARE_DIR: ${PostgreSQL_SHARE_DIR}")
-message(STATUS "@@@ INCLUDE_DIRECTORY_SERVER: ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}")
-
 # windows stuff
 if(WIN32)
   list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32)
@@ -55,13 +50,10 @@ if(WIN32)
   endif(MSVC)
 endif(WIN32)
 
-  set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
+set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}")
 
-
-#include(${CMAKE_CURRENT_LIST_DIR}/SelectLibraryConfigurations.cmake)
-#include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
-
+# Add pg_regress binary
 find_program(PostgreSQL_REGRESS pg_regress
   HINTS
     "${PostgreSQL_PKG_LIBRARY_DIR}/pgxs/src/test/regress/"
