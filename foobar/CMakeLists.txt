@@ -1,7 +1,10 @@
 # Build and install extension
 add_library(foobar MODULE foobar.c)
 target_link_libraries(foobar PostgreSQL::PostgreSQL)
-install(TARGETS foobar LIBRARY DESTINATION ${PostgreSQL_PKG_LIBRARY_DIR})
+set_target_properties(foobar PROPERTIES PREFIX "")
+install(TARGETS foobar
+  LIBRARY DESTINATION ${PostgreSQL_PKG_LIBRARY_DIR}
+)
 
 # Inject version number into .control file
 configure_file(foobar.control foobar.control)
