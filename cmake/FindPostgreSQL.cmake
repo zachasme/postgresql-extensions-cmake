@@ -61,10 +61,10 @@ if(WIN32)
   if(MSVC)
     list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32_msvc)
   endif(MSVC)
+endif(WIN32)
 
   set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}")
-endif(WIN32)
+  INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}")
 
 
 #include(${CMAKE_CURRENT_LIST_DIR}/SelectLibraryConfigurations.cmake)
