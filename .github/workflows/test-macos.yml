@@ -1,0 +1,29 @@
+name: test-linux
+
+on: [push]
+
+jobs:
+  linux:
+    strategy:
+      matrix:
+        config: [Release, Debug]
+
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install PostgreSQL server headers
+        run: sudo apt install postgresql-server-dev-14 postgis
+
+      - name: Generate
+        run: cmake -B build .
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }}
+
+      - name: Install
+        run: sudo cmake --install build --config ${{ matrix.config }}
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
