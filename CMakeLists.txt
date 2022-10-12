@@ -33,9 +33,4 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
 endif()
 
-# tmp
-set(PostgreSQL_PKG_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/install")
-
-add_library(foobar MODULE foobar.c)
-target_link_libraries(foobar PostgreSQL::PostgreSQL)
-install(TARGETS foobar LIBRARY DESTINATION ${PostgreSQL_PKG_LIBRARY_DIR})
+add_subdirectory(foobar)

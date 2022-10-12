@@ -1,0 +1,1 @@
+SELECT foobar(42);

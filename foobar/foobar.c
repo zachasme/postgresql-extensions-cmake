@@ -1,10 +1,9 @@
 #include <postgres.h>
 #include <fmgr.h>
 
-#include <lib/stringinfo.h>
-#include <libpq/pqformat.h>
-
 PG_MODULE_MAGIC;
+
+PGDLLEXPORT Datum foobar(PG_FUNCTION_ARGS);
 
 PG_FUNCTION_INFO_V1(foobar);
 

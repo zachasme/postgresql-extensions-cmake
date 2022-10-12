@@ -1,0 +1,3 @@
+comment = 'Foobar'
+default_version = '@PROJECT_VERSION@'
+relocatable = true

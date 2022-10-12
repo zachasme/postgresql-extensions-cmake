@@ -1,0 +1,33 @@
+name: CMake
+
+on: [push]
+
+jobs:
+  windows:
+    strategy:
+      matrix:
+        config: [Release, Debug]
+
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure PATH
+        run: echo "$PGBIN" >> $GITHUB_PATH
+
+      - name: Generate
+        run: cmake -B build .
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }}
+
+      - name: Instal
+        run: cmake --install build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
+
+defaults:
+  run:
+    shell: bash
