@@ -15,6 +15,7 @@ install(
 # Test extension
 find_program(PG_REGRESS pg_regress
   HINTS
+    "${PostgreSQL_PKG_LIBRARY_DIR}/pgxs/src/test/regress/"
     "${PostgreSQL_BIN_DIR}"
   REQUIRED)
 
