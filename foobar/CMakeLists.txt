@@ -1,7 +1,7 @@
 # Build and install extension
 add_library(foobar MODULE foobar.c)
 # <REMOVE THIS>
-target_include_directories(foobar PRIVATE ${PostgreSQL_INCLUDE_DIRS})
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${PostgreSQL_C_FLAGS}")
 # </REMOVE THIS>
 target_link_libraries(foobar PostgreSQL::PostgreSQL)
 install(TARGETS foobar LIBRARY DESTINATION ${PostgreSQL_PKG_LIBRARY_DIR})
