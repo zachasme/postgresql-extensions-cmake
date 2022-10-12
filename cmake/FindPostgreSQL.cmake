@@ -40,19 +40,13 @@ find_program(_PG_CONFIG pg_config
 execute_process(COMMAND ${_PG_CONFIG} --bindir            OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_BIN_DIR)
 execute_process(COMMAND ${_PG_CONFIG} --pkglibdir         OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR)
 execute_process(COMMAND ${_PG_CONFIG} --sharedir          OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_SHARE_DIR)
-if(WIN32) # the "not recorded" bug
-  message(STATUS "########### WIN32 ###################")
-  set(PostgreSQL_C_FLAGS "")
-else()
 message(STATUS "########### LINUX ###################")
-  execute_process(COMMAND ${_PG_CONFIG} --cflags            OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_C_FLAGS)
 endif()
 execute_process(COMMAND ${_PG_CONFIG} --includedir-server OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIRECTORY_SERVER)
 
 message(STATUS "pg_config at ${_PG_CONFIG}")
 message(STATUS "@@@ PKG_LIBRARY_DIR: ${PostgreSQL_PKG_LIBRARY_DIR}")
 message(STATUS "@@@ SHARE_DIR: ${PostgreSQL_SHARE_DIR}")
-message(STATUS "@@@ C_FLAGS: ${PostgreSQL_C_FLAGS}")
 message(STATUS "@@@ INCLUDE_DIRECTORY_SERVER: ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}")
 
 # windows stuff
@@ -69,3 +63,9 @@ endif(WIN32)
 
 #include(${CMAKE_CURRENT_LIST_DIR}/SelectLibraryConfigurations.cmake)
 #include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
+
+find_program(PostgreSQL_REGRESS pg_regress
+  HINTS
+    "${PostgreSQL_PKG_LIBRARY_DIR}/pgxs/src/test/regress/"
+    "${PostgreSQL_BIN_DIR}"
+)

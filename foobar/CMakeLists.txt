@@ -16,19 +16,15 @@ install(
 )
 
 # Test extension
-find_program(PG_REGRESS pg_regress
-  HINTS
-    "${PostgreSQL_PKG_LIBRARY_DIR}/pgxs/src/test/regress/"
-    "${PostgreSQL_BIN_DIR}"
-  REQUIRED)
-
-add_test(
-  NAME pg_regress
-  COMMAND ${PG_REGRESS}
-    --temp-instance=${CMAKE_BINARY_DIR}/tmp
-    --bindir=${PostgreSQL_BIN_DIR}
-    --inputdir=${CMAKE_CURRENT_SOURCE_DIR}
-    --outputdir=${CMAKE_CURRENT_BINARY_DIR}
-    --load-extension foobar
-    test1
-)
+if(PostgreSQL_REGRESS)
+  add_test(
+    NAME pg_regress
+    COMMAND ${PostgreSQL_REGRESS}
+      --temp-instance=${CMAKE_BINARY_DIR}/tmp
+      --bindir=${PostgreSQL_BIN_DIR}
+      --inputdir=${CMAKE_CURRENT_SOURCE_DIR}
+      --outputdir=${CMAKE_CURRENT_BINARY_DIR}
+      --load-extension foobar
+      test1
+  )
+endif()
