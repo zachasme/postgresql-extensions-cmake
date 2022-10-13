@@ -65,9 +65,11 @@ function(PostgreSQL_add_extension NAME)
   # Avoid lib* prefix on output file
   set_target_properties(${NAME} PROPERTIES PREFIX "")
 
+  message(STATUS "@@@@@ ${CMAKE_SOURCE_DIR}")
+
   # Generate .control file
   configure_file(
-    ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/FindPostgreSQL/control.in
+    ${CMAKE_SOURCE_DIR}/cmake/FindPostgreSQL/control.in
     ${NAME}.control
   )
 

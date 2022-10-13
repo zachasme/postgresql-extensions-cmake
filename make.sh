@@ -8,4 +8,6 @@ cmake --build build --config Release
 sudo cmake --install build --config Release
 
 # Run tests
-ctest --test-dir build --output-on-failure --build-config Release
+pushd build
+ctest --output-on-failure --build-config Release
+popd
