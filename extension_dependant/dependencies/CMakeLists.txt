@@ -10,8 +10,8 @@ set(ENABLE_FORMAT     OFF)
 set(ENABLE_LINTING    OFF)
 set(ENABLE_DOCS       OFF)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fwrapv")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mpc64")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fwrapv")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mpc64")
 
 FetchContent_Declare(
   h3
