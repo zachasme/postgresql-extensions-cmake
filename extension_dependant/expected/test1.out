@@ -1,6 +1,6 @@
-SELECT dependant(42);
+SELECT dependant('8a283082a677fff');
  dependant 
 -----------
-        42
+        10
 (1 row)
 

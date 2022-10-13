@@ -3,7 +3,7 @@ project(
   VERSION ${CMAKE_PROJECT_VERSION}
 )
 
-PostgreSQL_add_extension(${PROJECT_NAME}
+PostgreSQL_add_extension(dependant
   RELOCATABLE
   COMMENT "A PostgreSQL extension with dependencies"
   SOURCES
@@ -11,8 +11,12 @@ PostgreSQL_add_extension(${PROJECT_NAME}
   DATA
     dependant--1.0.0.sql
 )
-target_include_directories(${PROJECT_NAME}
+target_include_directories(dependant
   PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+# link dependencies
+add_subdirectory(dependencies)
+target_link_libraries(dependant h3)
 
 # Test your extension
 if(BUILD_TESTING AND PostgreSQL_REGRESS)
