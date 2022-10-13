@@ -34,4 +34,4 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 add_subdirectory(extension_basic)
-#add_subdirectory(extension_dependant)
+add_subdirectory(extension_dependant)
