@@ -22,8 +22,8 @@ FetchContent_MakeAvailable(h3)
 
 set_target_properties(h3 PROPERTIES
   INTERPROCEDURAL_OPTIMIZATION TRUE
-  POSITION_INDEPENDENT_CODE ON
-  C_VISIBILITY_PRESET hidden
+  POSITION_INDEPENDENT_CODE    ON
+  C_VISIBILITY_PRESET          hidden
 )
 
 set(H3_INCLUDE_DIR ${h3_BINARY_DIR}/src/h3lib/include)

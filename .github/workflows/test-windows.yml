@@ -15,7 +15,7 @@ jobs:
 
       - name: Configure PATH
         run: |
-          $PGBIN >> $env:GITHUB_PATH
+          "$PGBIN" >> $env:GITHUB_PATH
 
       - name: Generate
         run: cmake -B build .

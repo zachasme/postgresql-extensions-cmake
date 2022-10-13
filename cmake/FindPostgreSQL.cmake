@@ -59,7 +59,7 @@ function(PostgreSQL_add_extension NAME)
                         "${multiValueArgs}" ${ARGN} )
 
   # Add extension as a dynamically linked library
-  add_library(${NAME} SHARED ${EXTENSION_SOURCES})
+  add_library(${NAME} MODULE ${EXTENSION_SOURCES})
   # Link extension to PostgreSQL
   target_link_libraries(${NAME} PostgreSQL::PostgreSQL)
   # Avoid lib* prefix on output file
