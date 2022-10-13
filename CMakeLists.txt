@@ -14,7 +14,7 @@ endif()
 # This is your project statement. You should always list languages;
 # Listing the version is nice here since it sets lots of useful variables
 project(
-  foobar
+  postgresql-extensions-cmake
   VERSION 1.0.0
   LANGUAGES C
 )

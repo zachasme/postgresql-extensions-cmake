@@ -1,6 +1,6 @@
-SELECT foobar(42);
- foobar 
---------
-     42
+SELECT basic(42);
+ basic 
+-------
+    42
 (1 row)
 

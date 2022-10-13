@@ -1,1 +1,1 @@
-SELECT foobar(42);
+SELECT basic(42);
