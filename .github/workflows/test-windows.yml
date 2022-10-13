@@ -15,7 +15,7 @@ jobs:
 
       - name: Configure PATH
         run: |
-          echo "$PGBIN" >> $env:GITHUB_PATH
+          "$PGBIN" >> $env:GITHUB_PATH
 
       - name: Generate
         run: cmake -B build .
@@ -28,7 +28,3 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
-
-defaults:
-  run:
-    shell: bash
