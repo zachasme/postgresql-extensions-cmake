@@ -13,9 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Configure PATH
-        run: |
-          "hej" >> $env:GITHUB_PATH
+      #- name: Configure PATH
+      #  run: |
+      #    "hej" >> $env:GITHUB_PATH
 
       - name: Generate
         run: cmake -B build .
