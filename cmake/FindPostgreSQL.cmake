@@ -40,11 +40,13 @@ find_library(PostgreSQL_SERVER_LIBRARY
     lib
     ${PostgreSQL_LIBRARY_ADDITIONAL_SEARCH_SUFFIXES}
 )
+set(LINK_LIBRARIES PostgreSQL::PostgreSQL)
+if(PostgreSQL_SERVER_LIBRARY)
+  list(APPEND LINK_LIBRARIES "${PostgreSQL_SERVER_LIBRARY}")
+endif()
 
 # Fix Windows include directories
-set(LINK_LIBRARIES PostgreSQL::PostgreSQL)
 if(WIN32)
-  list(APPEND LINK_LIBRARIES "${PostgreSQL_SERVER_LIBRARY}")
   list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port)
   list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32)
   if(MSVC)
@@ -79,7 +81,11 @@ function(PostgreSQL_add_extension NAME)
     ${LINK_LIBRARIES}
   )
   # Avoid lib* prefix on output file
-  set_target_properties(${NAME} PROPERTIES PREFIX "")
+  set_target_properties(${NAME} PROPERTIES
+    INTERPROCEDURAL_OPTIMIZATION TRUE
+    C_VISIBILITY_PRESET hidden
+    PREFIX ""
+  )
 
   # Generate .control file
   configure_file(
