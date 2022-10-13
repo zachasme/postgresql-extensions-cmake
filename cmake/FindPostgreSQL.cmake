@@ -83,7 +83,7 @@ function(PostgreSQL_add_extension NAME)
   # Avoid lib* prefix on output file
   set_target_properties(${NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION TRUE
-    C_VISIBILITY_PRESET hidden
+    #C_VISIBILITY_PRESET hidden # <--- HOW TO GET THIS WORKING?
     PREFIX ""
   )
 
