@@ -1,3 +1,3 @@
 // This an example for sharing headers between extensions
 
-#define VERSION "@CMAKE_PROJECT_VERSION@"
+#define M_PI 3

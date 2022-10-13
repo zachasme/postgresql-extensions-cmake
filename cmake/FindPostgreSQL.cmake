@@ -46,6 +46,9 @@ find_program(PostgreSQL_REGRESS pg_regress
     "${PostgreSQL_PKG_LIBRARY_DIR}/pgxs/src/test/regress/"
     "${PostgreSQL_BIN_DIR}"
 )
+find_program(PostgreSQL_VALIDATE_EXTUPGRADE pg_validate_extupgrade
+)
+
 
 # Helper command to add extensions
 function(PostgreSQL_add_extension NAME)

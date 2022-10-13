@@ -1,0 +1,6 @@
+SELECT dependant(42);
+ dependant 
+-----------
+        42
+(1 row)
+

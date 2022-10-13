@@ -1,0 +1,1 @@
+SELECT dependant(42);

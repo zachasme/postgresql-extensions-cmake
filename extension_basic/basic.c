@@ -1,5 +1,5 @@
-#include "postgres.h"
-#include <fmgr.h>
+#include <postgres.h> // Primary include file for PostgreSQL server .c files
+#include <fmgr.h>     // Definitions for the Postgres function manager and function-call interface
 
 PG_MODULE_MAGIC;
 
