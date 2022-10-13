@@ -1,5 +1,6 @@
 #include <postgres.h> // Primary include file for PostgreSQL server .c files
 #include <fmgr.h>     // Definitions for the Postgres function manager and function-call interface
+#include <utils/elog.h>
 
 #include <h3api.h>    // Dependency example
 
