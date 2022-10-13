@@ -1,9 +1,4 @@
-project(
-  basic
-  VERSION ${CMAKE_PROJECT_VERSION}
-)
-
-PostgreSQL_add_extension(${PROJECT_NAME}
+PostgreSQL_add_extension(basic
   RELOCATABLE
   COMMENT "A basic PostgreSQL extension"
   SOURCES
