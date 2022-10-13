@@ -14,7 +14,8 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Configure PATH
-        run: '"$PGBIN" >> $env:GITHUB_PATH'
+        run: |
+          $PGBIN" >> $env:GITHUB_PATH
 
       - name: Generate
         run: cmake -B build .
