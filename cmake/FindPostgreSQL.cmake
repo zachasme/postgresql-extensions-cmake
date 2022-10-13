@@ -46,3 +46,35 @@ find_program(PostgreSQL_REGRESS pg_regress
     "${PostgreSQL_PKG_LIBRARY_DIR}/pgxs/src/test/regress/"
     "${PostgreSQL_BIN_DIR}"
 )
+
+# Helper command to add extensions
+function(PostgreSQL_add_extension NAME)
+  set(options RELOCATABLE)
+  set(oneValueArgs COMMENT)
+  set(multiValueArgs SOURCES DATA)
+  cmake_parse_arguments(EXTENSION "${options}" "${oneValueArgs}"
+                        "${multiValueArgs}" ${ARGN} )
+
+  # Add extension as a dynamically linked library
+  add_library(${NAME} SHARED ${EXTENSION_SOURCES})
+  # Link extension to PostgreSQL
+  target_link_libraries(${NAME} PostgreSQL::PostgreSQL)
+  # Avoid lib* prefix on output file
+  set_target_properties(${NAME} PROPERTIES PREFIX "")
+
+  # Generate .control file
+  configure_file(
+    ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/FindPostgreSQL/control.in
+    ${NAME}.control
+  )
+
+  # Install .so/.dll to pkglib-dir
+  install(TARGETS ${NAME} LIBRARY DESTINATION ${PostgreSQL_PKG_LIBRARY_DIR})
+  # Install everything else into share-dir
+  install(
+    FILES
+      ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.control
+      ${EXTENSION_DATA}
+    DESTINATION "${PostgreSQL_SHARE_DIR}/extension"
+  )
+endfunction()

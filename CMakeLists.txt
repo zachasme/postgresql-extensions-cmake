@@ -33,4 +33,5 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
 endif()
 
-add_subdirectory(foobar)
+add_subdirectory(extension_basic)
+add_subdirectory(extension_dependant)

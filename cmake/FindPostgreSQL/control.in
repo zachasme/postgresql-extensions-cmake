@@ -1,0 +1,3 @@
+comment = '@EXTENSION_COMMENT@'
+default_version = '@PROJECT_VERSION@'
+relocatable = @EXTENSION_RELOCATABLE@
