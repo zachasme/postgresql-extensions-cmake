@@ -31,14 +31,28 @@ execute_process(COMMAND ${_PG_CONFIG} --pkglibdir         OUTPUT_STRIP_TRAILING_
 execute_process(COMMAND ${_PG_CONFIG} --sharedir          OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_SHARE_DIR)
 execute_process(COMMAND ${_PG_CONFIG} --includedir-server OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIRECTORY_SERVER)
 
+# Fix only getting client lib
+find_library(PostgreSQL_SERVER_LIBRARY
+  REQUIRED
+  NAMES postgres
+  PATHS
+    ${PostgreSQL_ROOT_DIRECTORIES}
+  PATH_SUFFIXES
+    lib
+    ${PostgreSQL_LIBRARY_ADDITIONAL_SEARCH_SUFFIXES}
+)
+
 # Fix Windows include directories
 if(WIN32)
+  list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port)
   list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32)
   if(MSVC)
     list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32_msvc)
   endif(MSVC)
 endif(WIN32)
 set_target_properties(PostgreSQL::PostgreSQL PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}")
+
+# ----------------------------------------------------------------------------
 
 # Add pg_regress binary
 find_program(PostgreSQL_REGRESS pg_regress
@@ -48,7 +62,6 @@ find_program(PostgreSQL_REGRESS pg_regress
 )
 find_program(PostgreSQL_VALIDATE_EXTUPGRADE pg_validate_extupgrade
 )
-
 
 # Helper command to add extensions
 function(PostgreSQL_add_extension NAME)
@@ -61,11 +74,12 @@ function(PostgreSQL_add_extension NAME)
   # Add extension as a dynamically linked library
   add_library(${NAME} MODULE ${EXTENSION_SOURCES})
   # Link extension to PostgreSQL
-  target_link_libraries(${NAME} PostgreSQL::PostgreSQL)
+  target_link_libraries(${NAME}
+    PostgreSQL::PostgreSQL
+    ${PostgreSQL_SERVER_LIBRARY}
+  )
   # Avoid lib* prefix on output file
   set_target_properties(${NAME} PROPERTIES PREFIX "")
-
-  message(STATUS "@@@@@ ${CMAKE_SOURCE_DIR}")
 
   # Generate .control file
   configure_file(

@@ -1,8 +1,3 @@
-project(
-  dependant
-  VERSION ${CMAKE_PROJECT_VERSION}
-)
-
 PostgreSQL_add_extension(dependant
   RELOCATABLE
   COMMENT "A PostgreSQL extension with dependencies"

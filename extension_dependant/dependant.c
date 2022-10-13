@@ -1,5 +1,5 @@
 #include <postgres.h> // Primary include file for PostgreSQL server .c files
-#include <fmgr.h>     // Definitions for the Postgres function manager and function-call interface
+#include <fmgr.h>     // PG_FUNCTION_INFO_V1
 
 #include <h3api.h>    // Dependency example
 
@@ -7,9 +7,7 @@
 
 PG_MODULE_MAGIC;
 
-PGDLLEXPORT Datum dependant(PG_FUNCTION_ARGS);
-
-PG_FUNCTION_INFO_V1(dependant);
+PGDLLEXPORT PG_FUNCTION_INFO_V1(dependant);
 
 Datum dependant(PG_FUNCTION_ARGS) {
 	H3Index		h3;
