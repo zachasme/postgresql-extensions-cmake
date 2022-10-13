@@ -33,7 +33,6 @@ execute_process(COMMAND ${_PG_CONFIG} --includedir-server OUTPUT_STRIP_TRAILING_
 
 # Fix only getting client lib
 find_library(PostgreSQL_SERVER_LIBRARY
-  REQUIRED
   NAMES postgres
   PATHS
     ${PostgreSQL_ROOT_DIRECTORIES}
@@ -43,7 +42,9 @@ find_library(PostgreSQL_SERVER_LIBRARY
 )
 
 # Fix Windows include directories
+set(LINK_LIBRARIES PostgreSQL::PostgreSQL)
 if(WIN32)
+  list(APPEND LINK_LIBRARIES "${PostgreSQL_SERVER_LIBRARY}")
   list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port)
   list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32)
   if(MSVC)
@@ -75,8 +76,7 @@ function(PostgreSQL_add_extension NAME)
   add_library(${NAME} MODULE ${EXTENSION_SOURCES})
   # Link extension to PostgreSQL
   target_link_libraries(${NAME}
-    PostgreSQL::PostgreSQL
-    ${PostgreSQL_SERVER_LIBRARY}
+    ${LINK_LIBRARIES}
   )
   # Avoid lib* prefix on output file
   set_target_properties(${NAME} PROPERTIES PREFIX "")
