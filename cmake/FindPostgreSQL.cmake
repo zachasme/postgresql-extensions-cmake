@@ -30,6 +30,7 @@ execute_process(COMMAND ${_PG_CONFIG} --bindir            OUTPUT_STRIP_TRAILING_
 execute_process(COMMAND ${_PG_CONFIG} --pkglibdir         OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR)
 execute_process(COMMAND ${_PG_CONFIG} --sharedir          OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_SHARE_DIR)
 execute_process(COMMAND ${_PG_CONFIG} --includedir-server OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIRECTORY_SERVER)
+execute_process(COMMAND ${_PG_CONFIG} --ldflags            OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_LINK_FLAGS)
 
 # Fix only getting client lib
 find_library(PostgreSQL_SERVER_LIBRARY
@@ -56,6 +57,12 @@ if(WIN32)
 endif(WIN32)
 set_target_properties(PostgreSQL::PostgreSQL PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}")
 
+# fix macos symbols not found
+if (APPLE)
+  find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
+  set(PostgreSQL_LINK_FLAGS "${PostgreSQL_LINK_FLAGS} -bundle_loader ${_PG_BINARY}")
+endif ()
+
 # ----------------------------------------------------------------------------
 
 # Add pg_regress binary
@@ -80,6 +87,11 @@ function(PostgreSQL_add_extension NAME)
   # Link extension to PostgreSQL
   target_link_libraries(${NAME}
     ${LINK_LIBRARIES}
+  )
+  message(STATUS "#################### ${PostgreSQL_LINK_FLAGS}")
+  set_target_properties(
+    ${NAME}
+    PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS}
   )
   # Avoid lib* prefix on output file
   set_target_properties(${NAME} PROPERTIES
