@@ -1,120 +1,177 @@
-set(CMAKE_MODULE_PATH_OLD ${CMAKE_MODULE_PATH})
-set(CMAKE_MODULE_PATH "${CMAKE_ROOT}/Modules")
-find_package(PostgreSQL)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH_OLD})
-
-# We ran original:
-# https://github.com/Kitware/CMake/blob/master/Modules/FindPostgreSQL.cmake
-#
-# Let's fix this for extension work and try to upstream it later
+# Based on:
+# https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#find-modules
 # ----------------------------------------------------------------------------
 
-foreach(suffix ${PostgreSQL_KNOWN_VERSIONS})
-  if(WIN32)
-    list(APPEND PostgreSQL_PG_CONFIG_ADDITIONAL_SEARCH_SUFFIXES
-        "$ENV{ProgramFiles}/PostgreSQL/${suffix}/bin"
-        "$ENV{SystemDrive}/PostgreSQL/${suffix}/bin")
-  endif()
-  if(UNIX)
-    list(APPEND PostgreSQL_PG_CONFIG_ADDITIONAL_SEARCH_SUFFIXES
-        "/usr/lib/postgresql/${suffix}/bin")
-  endif()
-endforeach()
+# We will be configuring using pg_config
+find_program(PG_CONFIG pg_config
+  REQUIRED
+  PATHS ${PostgreSQL_ROOT_DIRECTORIES}
+  PATH_SUFFIXES bin)
 
-# try to find version specific first
-find_program(_PG_CONFIG pg_config NO_DEFAULT_PATH PATHS ${PostgreSQL_PG_CONFIG_ADDITIONAL_SEARCH_SUFFIXES})
-# fallback to system-wide
-find_program(_PG_CONFIG pg_config PATHS /usr/local/pgsql/bin)
+execute_process(COMMAND ${PG_CONFIG} --bindir            OUTPUT_VARIABLE PostgreSQL_BIN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --docdir            OUTPUT_VARIABLE PostgreSQL_DOC_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --htmldir           OUTPUT_VARIABLE PostgreSQL_HTML_DIR           OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --includedir        OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --pkgincludedir     OUTPUT_VARIABLE PostgreSQL_PKGINCLUDE_DIR     OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --includedir-server OUTPUT_VARIABLE PostgreSQL_INCLUDE_SERVER_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIB_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKGLIB_DIR         OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --localedir         OUTPUT_VARIABLE PostgreSQL_LOCALE_DIR         OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --mandir            OUTPUT_VARIABLE PostgreSQL_MAN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --sharedir          OUTPUT_VARIABLE PostgreSQL_SHARE_DIR          OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --cppflags          OUTPUT_VARIABLE PostgreSQL_CPPFLAGS           OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --cflags            OUTPUT_VARIABLE PostgreSQL_CFLAGS             OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --cflags_sl         OUTPUT_VARIABLE PostgreSQL_CFLAGS_SL          OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --ldflags           OUTPUT_VARIABLE PostgreSQL_LDFLAGS            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --ldflags_ex        OUTPUT_VARIABLE PostgreSQL_LDFLAGS_EX         OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --ldflags_sl        OUTPUT_VARIABLE PostgreSQL_LDFLAGS_SL         OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --libs              OUTPUT_VARIABLE PostgreSQL_LIBS               OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-execute_process(COMMAND ${_PG_CONFIG} --bindir            OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_BIN_DIR)
-execute_process(COMMAND ${_PG_CONFIG} --pkglibdir         OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR)
-execute_process(COMMAND ${_PG_CONFIG} --sharedir          OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_SHARE_DIR)
-execute_process(COMMAND ${_PG_CONFIG} --includedir-server OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIRECTORY_SERVER)
+message(STATUS "v ${PostgreSQL_VERSION}")
 
-# Fix only getting client lib
-find_library(PostgreSQL_SERVER_LIBRARY
+# Set version
+# ----------------------------------------------------------------------------
+string(REGEX MATCHALL "[0-9]+" PostgreSQL_VERSION_LIST "${PostgreSQL_VERSION}")
+list(GET PostgreSQL_VERSION_LIST 0 PostgreSQL_VERSION_MAJOR)
+list(GET PostgreSQL_VERSION_LIST 1 PostgreSQL_VERSION_MINOR)
+set(PostgreSQL_VERSION "${PostgreSQL_VERSION_MAJOR}.${PostgreSQL_VERSION_MINOR}")
+
+message(STATUS "PostgreSQL_VERSION = ${PostgreSQL_VERSION}")
+message(STATUS "PostgreSQL_VERSION_MAJOR = ${PostgreSQL_VERSION_MAJOR}")
+message(STATUS "PostgreSQL_VERSION_MINOR = ${PostgreSQL_VERSION_MINOR}")
+
+
+# ----------------------------------------------------------------------------
+
+# First, we try to use pkg-config to find the library. Note that we cannot rely on this, as it may not be available, but it provides a good starting point.
+find_package(PkgConfig)
+pkg_check_modules(PC_PostgreSQL
+                  REQUIRED
+                  IMPORTED_TARGET
+                  libpq)
+
+# This should define some variables starting PC_Foo_ that contain the information from the Foo.pc file.
+message(STATUS "PC_PostgreSQL_FOUND = ${PC_PostgreSQL_FOUND}")
+message(STATUS "PC_PostgreSQL_LIBRARIES = ${PC_PostgreSQL_LIBRARIES}")
+message(STATUS "PC_PostgreSQL_LINK_LIBRARIES = ${PC_PostgreSQL_LINK_LIBRARIES}")
+message(STATUS "PC_PostgreSQL_LIBRARY_DIRS = ${PC_PostgreSQL_LIBRARY_DIRS}")
+message(STATUS "PC_PostgreSQL_LDFLAGS = ${PC_PostgreSQL_LDFLAGS}")
+message(STATUS "PC_PostgreSQL_LDFLAGS_OTHER = ${PC_PostgreSQL_LDFLAGS_OTHER}")
+message(STATUS "PC_PostgreSQL_INCLUDE_DIRS = ${PC_PostgreSQL_INCLUDE_DIRS}")
+message(STATUS "PC_PostgreSQL_CFLAGS = ${PC_PostgreSQL_CFLAGS}")
+message(STATUS "PC_PostgreSQL_CFLAGS_OTHER = ${PC_PostgreSQL_CFLAGS_OTHER}")
+
+message(STATUS "PC_PostgreSQL_VERSION = ${PC_PostgreSQL_VERSION}")
+message(STATUS "PC_PostgreSQL_PREFIX = ${PC_PostgreSQL_PREFIX}")
+message(STATUS "PC_PostgreSQL_INCLUDEDIR = ${PC_PostgreSQL_INCLUDEDIR}")
+message(STATUS "PC_PostgreSQL_LIBDIR = ${PC_PostgreSQL_LIBDIR}")
+
+# Alternatively, if the library is available with multiple configurations, you can use SelectLibraryConfigurations to automatically set the Foo_LIBRARY variable instead:
+find_library(PostgreSQL_LIBRARY_RELEASE
   NAMES postgres
-  PATHS
-    ${PostgreSQL_ROOT_DIRECTORIES}
-  PATH_SUFFIXES
-    lib
-    ${PostgreSQL_LIBRARY_ADDITIONAL_SEARCH_SUFFIXES}
+  PATHS ${PC_PostgreSQL_LIBRARY_DIRS}/Release
 )
-message(STATUS "PostgreSQL_SERVER_LIBRARY: ${PostgreSQL_SERVER_LIBRARY}")
-set(LINK_LIBRARIES PostgreSQL::PostgreSQL)
-if(PostgreSQL_SERVER_LIBRARY)
-  list(APPEND LINK_LIBRARIES "${PostgreSQL_SERVER_LIBRARY}")
+find_library(PostgreSQL_LIBRARY_DEBUG
+  NAMES postgres
+  PATHS ${PC_PostgreSQL_LIBRARY_DIRS}/Debug
+)
+
+include(SelectLibraryConfigurations)
+select_library_configurations(PostgreSQL)
+
+# VERSION
+# ----------------------------------------------------------------------------
+
+# If you have a good way of getting the version (from a header file, for example),
+# you can use that information to set Foo_VERSION (although note that find modules have traditionally used Foo_VERSION_STRING, so you may want to set both).
+
+string(REGEX MATCHALL "[0-9]+" PostgreSQL_VERSION_LIST "${PostgreSQL_VERSION}")
+list(GET PostgreSQL_VERSION_LIST 0 PostgreSQL_VERSION_MAJOR)
+list(GET PostgreSQL_VERSION_LIST 1 PostgreSQL_VERSION_MINOR)
+set(PostgreSQL_VERSION "${PostgreSQL_VERSION_MAJOR}.${PostgreSQL_VERSION_MINOR}")
+
+#                     ------------------------------------
+
+# Otherwise, attempt to use the information from pkg-config
+
+# set(Foo_VERSION ${PC_PostgreSQL_VERSION})
+
+# ----------------------------------------------------------------------------
+
+# Now we can use FindPackageHandleStandardArgs to do
+# most of the rest of the work for us
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(PostgreSQL
+  FOUND_VAR PostgreSQL_FOUND
+  REQUIRED_VARS
+    PostgreSQL_LIBRARY
+    PostgreSQL_INCLUDE_DIR
+  VERSION_VAR PostgreSQL_VERSION
+)
+
+# PROVIDE LINKAGE
+# ----------------------------------------------------------------------------
+
+# At this point, we have to provide a way for users of the find module to link to the library or libraries that were found. There are two approaches, as discussed in the Find Modules section above.
+
+# The traditional variable approach looks like
+
+# if(Foo_FOUND)
+#   set(Foo_LIBRARIES ${Foo_LIBRARY})
+#   set(Foo_INCLUDE_DIRS ${Foo_INCLUDE_DIR})
+#   set(Foo_DEFINITIONS ${PC_Foo_CFLAGS_OTHER})
+# endif()
+
+#                     ------------------------------------
+
+# When providing imported targets, these should be namespaced (hence the Foo:: prefix); CMake will recognize that values passed to target_link_libraries() that contain :: in their name are supposed to be imported targets (rather than just library names), and will produce appropriate diagnostic messages if that target does not exist (see policy CMP0028).
+
+if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::PostgreSQL)
+  add_library(PostgreSQL::PostgreSQL UNKNOWN IMPORTED)
+  set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
+    IMPORTED_LOCATION "${PostgreSQL_LIBRARY}"
+    INTERFACE_COMPILE_OPTIONS "${PC_PostgreSQL_CFLAGS_OTHER}"
+    INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIR}"
+  )
 endif()
 
-# Fix Windows include directories
-if(WIN32)
-  list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port)
-  list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32)
-  if(MSVC)
-    list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32_msvc)
-  endif(MSVC)
-endif(WIN32)
-set_target_properties(PostgreSQL::PostgreSQL PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}")
+#                     ------------------------------------
 
-# fix macos symbols not found
-if (APPLE)
-  execute_process(COMMAND ${_PG_CONFIG} --ldflags           OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_LINK_FLAGS)
-  find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
-  set(PostgreSQL_LINK_FLAGS "${PostgreSQL_LINK_FLAGS} -bundle_loader ${_PG_BINARY}")
-endif ()
+# If the library is available with multiple configurations, the IMPORTED_CONFIGURATIONS target property should also be populated:
+
+# if(PostgreSQL_FOUND)
+#   if (NOT TARGET PostgreSQL::PostgreSQL)
+#     add_library(PostgreSQL::PostgreSQL UNKNOWN IMPORTED)
+#   endif()
+#   if (PostgreSQL_LIBRARY_RELEASE)
+#     set_property(TARGET PostgreSQL::PostgreSQL APPEND PROPERTY
+#       IMPORTED_CONFIGURATIONS RELEASE
+#     )
+#     set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
+#       IMPORTED_LOCATION_RELEASE "${PostgreSQL_LIBRARY_RELEASE}"
+#     )
+#   endif()
+#   if (PostgreSQL_LIBRARY_DEBUG)
+#     set_property(TARGET PostgreSQL::PostgreSQL APPEND PROPERTY
+#       IMPORTED_CONFIGURATIONS DEBUG
+#     )
+#     set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
+#       IMPORTED_LOCATION_DEBUG "${PostgreSQL_LIBRARY_DEBUG}"
+#     )
+#   endif()
+#   set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
+#     INTERFACE_COMPILE_OPTIONS "${PC_PostgreSQL_CFLAGS_OTHER}"
+#     INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIR}"
+#   )
+# endif()
 
 # ----------------------------------------------------------------------------
 
-# Add pg_regress binary
-find_program(PostgreSQL_REGRESS pg_regress
-  HINTS
-    "${PostgreSQL_PKG_LIBRARY_DIR}/pgxs/src/test/regress/"
-    "${PostgreSQL_BIN_DIR}"
+# The RELEASE variant should be listed first in the property so that the variant is chosen if the user uses a configuration which is not an exact match for any listed IMPORTED_CONFIGURATIONS.
+
+# Most of the cache variables should be hidden in the ccmake interface unless the user explicitly asks to edit them.
+mark_as_advanced(
+  Foo_INCLUDE_DIR
+  Foo_LIBRARY
 )
-find_program(PostgreSQL_VALIDATE_EXTUPGRADE pg_validate_extupgrade
-)
-
-# Helper command to add extensions
-function(PostgreSQL_add_extension NAME)
-  set(options RELOCATABLE)
-  set(oneValueArgs COMMENT)
-  set(multiValueArgs SOURCES DATA)
-  cmake_parse_arguments(EXTENSION "${options}" "${oneValueArgs}"
-                        "${multiValueArgs}" ${ARGN} )
-
-  # Add extension as a dynamically linked library
-  add_library(${NAME} MODULE ${EXTENSION_SOURCES})
-  # Link extension to PostgreSQL
-  target_link_libraries(${NAME}
-    ${LINK_LIBRARIES}
-  )
-  # fix apple missing symbols
-  if(APPLE)
-    set_target_properties(
-      ${NAME}
-      PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS}
-    )
-  endif()
-  # Avoid lib* prefix on output file
-  set_target_properties(${NAME} PROPERTIES
-    INTERPROCEDURAL_OPTIMIZATION TRUE
-    #C_VISIBILITY_PRESET hidden # <--- HOW TO GET THIS WORKING?
-    PREFIX ""
-  )
-
-  # Generate .control file
-  configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/FindPostgreSQL/control.in
-    ${NAME}.control
-  )
-
-  # Install .so/.dll to pkglib-dir
-  install(TARGETS ${NAME} LIBRARY DESTINATION "${PostgreSQL_PKG_LIBRARY_DIR}")
-  # Install everything else into share-dir
-  install(
-    FILES
-      ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.control
-      ${EXTENSION_DATA}
-    DESTINATION "${PostgreSQL_SHARE_DIR}/extension"
-  )
-endfunction()
