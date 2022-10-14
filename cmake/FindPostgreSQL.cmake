@@ -30,9 +30,6 @@ execute_process(COMMAND ${_PG_CONFIG} --bindir            OUTPUT_STRIP_TRAILING_
 execute_process(COMMAND ${_PG_CONFIG} --pkglibdir         OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR)
 execute_process(COMMAND ${_PG_CONFIG} --sharedir          OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_SHARE_DIR)
 execute_process(COMMAND ${_PG_CONFIG} --includedir-server OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIRECTORY_SERVER)
-if(UNIX)
-  execute_process(COMMAND ${_PG_CONFIG} --ldflags           OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_LINK_FLAGS)
-endif()
 
 # Fix only getting client lib
 find_library(PostgreSQL_SERVER_LIBRARY
@@ -61,6 +58,7 @@ set_target_properties(PostgreSQL::PostgreSQL PROPERTIES INTERFACE_INCLUDE_DIRECT
 
 # fix macos symbols not found
 if (APPLE)
+  execute_process(COMMAND ${_PG_CONFIG} --ldflags           OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PostgreSQL_LINK_FLAGS)
   find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
   set(PostgreSQL_LINK_FLAGS "${PostgreSQL_LINK_FLAGS} -bundle_loader ${_PG_BINARY}")
 endif ()
@@ -90,11 +88,13 @@ function(PostgreSQL_add_extension NAME)
   target_link_libraries(${NAME}
     ${LINK_LIBRARIES}
   )
-  message(STATUS "#################### ${PostgreSQL_LINK_FLAGS}")
-  set_target_properties(
-    ${NAME}
-    PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS}
-  )
+  # fix apple missing symbols
+  if(APPLE)
+    set_target_properties(
+      ${NAME}
+      PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS}
+    )
+  endif()
   # Avoid lib* prefix on output file
   set_target_properties(${NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION TRUE
