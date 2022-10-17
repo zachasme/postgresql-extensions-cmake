@@ -18,7 +18,7 @@ execute_process(COMMAND ${PG_CONFIG} --htmldir           OUTPUT_VARIABLE Postgre
 execute_process(COMMAND ${PG_CONFIG} --includedir        OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --pkgincludedir     OUTPUT_VARIABLE PostgreSQL_PKGINCLUDE_DIR     OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --includedir-server OUTPUT_VARIABLE PostgreSQL_INCLUDE_SERVER_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIB_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIBRARY_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --localedir         OUTPUT_VARIABLE PostgreSQL_LOCALE_DIR         OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --mandir            OUTPUT_VARIABLE PostgreSQL_MAN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -33,7 +33,9 @@ execute_process(COMMAND ${PG_CONFIG} --libs              OUTPUT_VARIABLE Postgre
 execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 string(REPLACE " " ";" PostgreSQL_CFLAGS ${PostgreSQL_CFLAGS})
+string(REPLACE " " ";" PostgreSQL_LDFLAGS ${PostgreSQL_LDFLAGS})
 list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR}" "${PostgreSQL_INCLUDE_SERVER_DIR}")
+list(APPEND PostgreSQL_LIBRARY_DIRS "${PostgreSQL_LIBRARY_DIR}")
 
 # windows fix
 if(WIN32)
@@ -46,7 +48,7 @@ endif(WIN32)
 # apple fix
 if(APPLE)
   find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
-  set(PostgreSQL_LINK_FLAGS "${PostgreSQL_LINK_FLAGS} -bundle_loader ${_PG_BINARY}")
+  APPEND(PostgreSQL_LDFLAGS "-bundle_loader ${_PG_BINARY}")
   set(PostgreSQL_LIBRARY ${_PG_BINARY})
 endif()
 
@@ -84,7 +86,11 @@ endif()
 
 find_library(PostgreSQL_LIBRARY
   NAMES pq
-  PATHS ${PC_PostgreSQL_LIBRARY_DIRS}
+  PATHS ${PostgreSQL_LIBRARY_DIRS}
+)
+find_library(PostgreSQL_LIBRARY
+  NAMES libpq
+  PATHS ${PostgreSQL_LIBRARY_DIRS}
 )
 
 #                     ------------------------------------
