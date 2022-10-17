@@ -24,7 +24,8 @@ project(
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Find packages go here.
-find_package(PostgreSQL REQUIRED)
+find_package(PostgreSQL 14.5 REQUIRED)
+include(AddPostgreSQLExtension)
 
 # You should usually split this into folders, but this is a simple example
 

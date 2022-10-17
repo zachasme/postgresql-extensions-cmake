@@ -2,6 +2,10 @@
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#find-modules
 # ----------------------------------------------------------------------------
 
+string(REPLACE "." ";" PostgreSQL_FIND_VERSION_LIST "${PostgreSQL_FIND_VERSION}")
+list(GET PostgreSQL_FIND_VERSION_LIST 0 PostgreSQL_FIND_VERSION_MAJOR)
+list(GET PostgreSQL_FIND_VERSION_LIST 1 PostgreSQL_FIND_VERSION_MINOR)
+
 # We will be configuring using pg_config
 find_program(PG_CONFIG pg_config
   REQUIRED
@@ -15,7 +19,7 @@ execute_process(COMMAND ${PG_CONFIG} --includedir        OUTPUT_VARIABLE Postgre
 execute_process(COMMAND ${PG_CONFIG} --pkgincludedir     OUTPUT_VARIABLE PostgreSQL_PKGINCLUDE_DIR     OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --includedir-server OUTPUT_VARIABLE PostgreSQL_INCLUDE_SERVER_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIB_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKGLIB_DIR         OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --localedir         OUTPUT_VARIABLE PostgreSQL_LOCALE_DIR         OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --mandir            OUTPUT_VARIABLE PostgreSQL_MAN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --sharedir          OUTPUT_VARIABLE PostgreSQL_SHARE_DIR          OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -28,60 +32,65 @@ execute_process(COMMAND ${PG_CONFIG} --ldflags_sl        OUTPUT_VARIABLE Postgre
 execute_process(COMMAND ${PG_CONFIG} --libs              OUTPUT_VARIABLE PostgreSQL_LIBS               OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-message(STATUS "v ${PostgreSQL_VERSION}")
-
-# Set version
-# ----------------------------------------------------------------------------
-string(REGEX MATCHALL "[0-9]+" PostgreSQL_VERSION_LIST "${PostgreSQL_VERSION}")
-list(GET PostgreSQL_VERSION_LIST 0 PostgreSQL_VERSION_MAJOR)
-list(GET PostgreSQL_VERSION_LIST 1 PostgreSQL_VERSION_MINOR)
-set(PostgreSQL_VERSION "${PostgreSQL_VERSION_MAJOR}.${PostgreSQL_VERSION_MINOR}")
-
-message(STATUS "PostgreSQL_VERSION = ${PostgreSQL_VERSION}")
-message(STATUS "PostgreSQL_VERSION_MAJOR = ${PostgreSQL_VERSION_MAJOR}")
-message(STATUS "PostgreSQL_VERSION_MINOR = ${PostgreSQL_VERSION_MINOR}")
-
+list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIR} ${PostgreSQL_INCLUDE_SERVER_DIR})
+string(REPLACE " " ";" PostgreSQL_CFLAGS ${PostgreSQL_CFLAGS})
 
 # ----------------------------------------------------------------------------
 
 # First, we try to use pkg-config to find the library. Note that we cannot rely on this, as it may not be available, but it provides a good starting point.
-find_package(PkgConfig)
-pkg_check_modules(PC_PostgreSQL
-                  REQUIRED
-                  IMPORTED_TARGET
-                  libpq)
+
+# find_package(PkgConfig)
+# pkg_check_modules(PC_PostgreSQL
+                  # REQUIRED
+                  # IMPORTED_TARGET
+                  # libpq)
 
 # This should define some variables starting PC_Foo_ that contain the information from the Foo.pc file.
-message(STATUS "PC_PostgreSQL_FOUND = ${PC_PostgreSQL_FOUND}")
-message(STATUS "PC_PostgreSQL_LIBRARIES = ${PC_PostgreSQL_LIBRARIES}")
-message(STATUS "PC_PostgreSQL_LINK_LIBRARIES = ${PC_PostgreSQL_LINK_LIBRARIES}")
-message(STATUS "PC_PostgreSQL_LIBRARY_DIRS = ${PC_PostgreSQL_LIBRARY_DIRS}")
-message(STATUS "PC_PostgreSQL_LDFLAGS = ${PC_PostgreSQL_LDFLAGS}")
-message(STATUS "PC_PostgreSQL_LDFLAGS_OTHER = ${PC_PostgreSQL_LDFLAGS_OTHER}")
-message(STATUS "PC_PostgreSQL_INCLUDE_DIRS = ${PC_PostgreSQL_INCLUDE_DIRS}")
-message(STATUS "PC_PostgreSQL_CFLAGS = ${PC_PostgreSQL_CFLAGS}")
-message(STATUS "PC_PostgreSQL_CFLAGS_OTHER = ${PC_PostgreSQL_CFLAGS_OTHER}")
 
-message(STATUS "PC_PostgreSQL_VERSION = ${PC_PostgreSQL_VERSION}")
-message(STATUS "PC_PostgreSQL_PREFIX = ${PC_PostgreSQL_PREFIX}")
-message(STATUS "PC_PostgreSQL_INCLUDEDIR = ${PC_PostgreSQL_INCLUDEDIR}")
-message(STATUS "PC_PostgreSQL_LIBDIR = ${PC_PostgreSQL_LIBDIR}")
+# PC_ ... _FOUND
+# PC_ ... _LIBRARIES
+# PC_ ... _LINK_LIBRARIES
+# PC_ ... _LIBRARY_DIRS
+# PC_ ... _LDFLAGS
+# PC_ ... _LDFLAGS_OTHER
+# PC_ ... _INCLUDE_DIRS
+# PC_ ... _CFLAGS
+# PC_ ... _CFLAGS_OTHER
+
+# PC_ ... _VERSION
+# PC_ ... _PREFIX
+# PC_ ... _INCLUDEDIR
+# PC_ ... _LIBDIR
+
+# ----------------------------------------------------------------------------
+# LIBRARIES AND INCLUDE FILES
+
+# Now we need to find the libraries and include files; we use the information from pkg-config to provide hints to CMake about where to look.
+
+find_library(PostgreSQL_LIBRARY
+  NAMES pq
+  PATHS ${PC_PostgreSQL_LIBRARY_DIRS}
+)
+
+#                     ------------------------------------
 
 # Alternatively, if the library is available with multiple configurations, you can use SelectLibraryConfigurations to automatically set the Foo_LIBRARY variable instead:
-find_library(PostgreSQL_LIBRARY_RELEASE
-  NAMES postgres
-  PATHS ${PC_PostgreSQL_LIBRARY_DIRS}/Release
-)
-find_library(PostgreSQL_LIBRARY_DEBUG
-  NAMES postgres
-  PATHS ${PC_PostgreSQL_LIBRARY_DIRS}/Debug
-)
 
-include(SelectLibraryConfigurations)
-select_library_configurations(PostgreSQL)
+# find_library(PostgreSQL_LIBRARY_RELEASE
+#   NAMES postgres
+#   PATHS ${PC_PostgreSQL_LIBRARY_DIRS}/Release
+# )
+# find_library(PostgreSQL_LIBRARY_DEBUG
+#   NAMES postgres
+#   PATHS ${PC_PostgreSQL_LIBRARY_DIRS}/Debug
+# )
 
-# VERSION
+# include(SelectLibraryConfigurations)
+# select_library_configurations(PostgreSQL)
+
+# END LIBRARIES AND INCLUDE FILES
 # ----------------------------------------------------------------------------
+# VERSION
 
 # If you have a good way of getting the version (from a header file, for example),
 # you can use that information to set Foo_VERSION (although note that find modules have traditionally used Foo_VERSION_STRING, so you may want to set both).
@@ -91,12 +100,11 @@ list(GET PostgreSQL_VERSION_LIST 0 PostgreSQL_VERSION_MAJOR)
 list(GET PostgreSQL_VERSION_LIST 1 PostgreSQL_VERSION_MINOR)
 set(PostgreSQL_VERSION "${PostgreSQL_VERSION_MAJOR}.${PostgreSQL_VERSION_MINOR}")
 
-#                     ------------------------------------
-
 # Otherwise, attempt to use the information from pkg-config
 
 # set(Foo_VERSION ${PC_PostgreSQL_VERSION})
 
+# END VERSION
 # ----------------------------------------------------------------------------
 
 # Now we can use FindPackageHandleStandardArgs to do
@@ -106,12 +114,12 @@ find_package_handle_standard_args(PostgreSQL
   FOUND_VAR PostgreSQL_FOUND
   REQUIRED_VARS
     PostgreSQL_LIBRARY
-    PostgreSQL_INCLUDE_DIR
+    PostgreSQL_INCLUDE_DIRS
   VERSION_VAR PostgreSQL_VERSION
 )
 
-# PROVIDE LINKAGE
 # ----------------------------------------------------------------------------
+# PROVIDE LINKAGE
 
 # At this point, we have to provide a way for users of the find module to link to the library or libraries that were found. There are two approaches, as discussed in the Find Modules section above.
 
@@ -131,8 +139,8 @@ if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::PostgreSQL)
   add_library(PostgreSQL::PostgreSQL UNKNOWN IMPORTED)
   set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
     IMPORTED_LOCATION "${PostgreSQL_LIBRARY}"
-    INTERFACE_COMPILE_OPTIONS "${PC_PostgreSQL_CFLAGS_OTHER}"
-    INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIR}"
+    #INTERFACE_COMPILE_OPTIONS "${PostgreSQL_CFLAGS_OTHER}"
+    INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}"
   )
 endif()
 
@@ -162,16 +170,37 @@ endif()
 #   endif()
 #   set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
 #     INTERFACE_COMPILE_OPTIONS "${PC_PostgreSQL_CFLAGS_OTHER}"
-#     INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIR}"
+#     INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}"
 #   )
 # endif()
 
+# END PROVIDE LINKAGE
 # ----------------------------------------------------------------------------
 
 # The RELEASE variant should be listed first in the property so that the variant is chosen if the user uses a configuration which is not an exact match for any listed IMPORTED_CONFIGURATIONS.
 
 # Most of the cache variables should be hidden in the ccmake interface unless the user explicitly asks to edit them.
 mark_as_advanced(
-  Foo_INCLUDE_DIR
-  Foo_LIBRARY
+  PostgreSQL_INCLUDE_DIRS
+  PostgreSQL_LIBRARY
 )
+
+# ----------------------------------------------------------------------------
+# LOG IT
+
+message(STATUS "Find version:  ${PostgreSQL_FIND_VERSION}")
+message(STATUS "Find major:    ${PostgreSQL_FIND_VERSION_MAJOR}")
+message(STATUS "Find minor:    ${PostgreSQL_FIND_VERSION_MINOR}")
+
+message(STATUS "Found version: ${PostgreSQL_VERSION}")
+message(STATUS "Found major:   ${PostgreSQL_VERSION_MAJOR}")
+message(STATUS "Found minor:   ${PostgreSQL_VERSION_MINOR}")
+
+# Get all variables
+GET_CMAKE_PROPERTY(vars VARIABLES)
+FOREACH(var ${vars})
+  STRING(REGEX MATCH "^PostgreSQL_" item ${var})
+  IF(item)
+    message(STATUS "${var} = ${${var}}")
+  ENDIF(item)
+ENDFOREACH(var)
