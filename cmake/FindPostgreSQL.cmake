@@ -33,14 +33,21 @@ execute_process(COMMAND ${PG_CONFIG} --libs              OUTPUT_VARIABLE Postgre
 execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 string(REPLACE " " ";" PostgreSQL_CFLAGS ${PostgreSQL_CFLAGS})
-
 list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR}" "${PostgreSQL_INCLUDE_SERVER_DIR}")
+
+# windows fix
 if(WIN32)
   list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32")
   if(MSVC)
     list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32_msvc")
   endif(MSVC)
 endif(WIN32)
+
+# apple fix
+if(APPLE)
+  find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
+  set(PostgreSQL_LINK_FLAGS "${PostgreSQL_LINK_FLAGS} -bundle_loader ${_PG_BINARY}")
+endif()
 
 # ----------------------------------------------------------------------------
 
@@ -164,6 +171,7 @@ if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::PostgreSQL)
   set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
     IMPORTED_LOCATION "${PostgreSQL_LIBRARY}"
     #INTERFACE_COMPILE_OPTIONS "${PostgreSQL_CFLAGS_OTHER}"
+    INTERFACE_LINK_OPTIONS "${PostgreSQL_LINK_FLAGS}"
     INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}"
   )
 endif()
