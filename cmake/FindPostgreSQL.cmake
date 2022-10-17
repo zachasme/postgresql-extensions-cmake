@@ -32,8 +32,15 @@ execute_process(COMMAND ${PG_CONFIG} --ldflags_sl        OUTPUT_VARIABLE Postgre
 execute_process(COMMAND ${PG_CONFIG} --libs              OUTPUT_VARIABLE PostgreSQL_LIBS               OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIR} ${PostgreSQL_INCLUDE_SERVER_DIR})
 string(REPLACE " " ";" PostgreSQL_CFLAGS ${PostgreSQL_CFLAGS})
+
+list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR}" "${PostgreSQL_INCLUDE_SERVER_DIR}")
+if(WIN32)
+  list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32")
+  if(MSVC)
+    list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32_msvc")
+  endif(MSVC)
+endif(WIN32)
 
 # ----------------------------------------------------------------------------
 
@@ -106,6 +113,23 @@ set(PostgreSQL_VERSION "${PostgreSQL_VERSION_MAJOR}.${PostgreSQL_VERSION_MINOR}"
 
 # END VERSION
 # ----------------------------------------------------------------------------
+
+message(STATUS "Find version:  ${PostgreSQL_FIND_VERSION}")
+message(STATUS "Find major:    ${PostgreSQL_FIND_VERSION_MAJOR}")
+message(STATUS "Find minor:    ${PostgreSQL_FIND_VERSION_MINOR}")
+
+message(STATUS "Found version: ${PostgreSQL_VERSION}")
+message(STATUS "Found major:   ${PostgreSQL_VERSION_MAJOR}")
+message(STATUS "Found minor:   ${PostgreSQL_VERSION_MINOR}")
+
+# Get all variables
+GET_CMAKE_PROPERTY(vars VARIABLES)
+FOREACH(var ${vars})
+  STRING(REGEX MATCH "^PostgreSQL_" item ${var})
+  IF(item)
+    message(STATUS "${var} = ${${var}}")
+  ENDIF(item)
+ENDFOREACH(var)
 
 # Now we can use FindPackageHandleStandardArgs to do
 # most of the rest of the work for us
@@ -184,23 +208,3 @@ mark_as_advanced(
   PostgreSQL_INCLUDE_DIRS
   PostgreSQL_LIBRARY
 )
-
-# ----------------------------------------------------------------------------
-# LOG IT
-
-message(STATUS "Find version:  ${PostgreSQL_FIND_VERSION}")
-message(STATUS "Find major:    ${PostgreSQL_FIND_VERSION_MAJOR}")
-message(STATUS "Find minor:    ${PostgreSQL_FIND_VERSION_MINOR}")
-
-message(STATUS "Found version: ${PostgreSQL_VERSION}")
-message(STATUS "Found major:   ${PostgreSQL_VERSION_MAJOR}")
-message(STATUS "Found minor:   ${PostgreSQL_VERSION_MINOR}")
-
-# Get all variables
-GET_CMAKE_PROPERTY(vars VARIABLES)
-FOREACH(var ${vars})
-  STRING(REGEX MATCH "^PostgreSQL_" item ${var})
-  IF(item)
-    message(STATUS "${var} = ${${var}}")
-  ENDIF(item)
-ENDFOREACH(var)
