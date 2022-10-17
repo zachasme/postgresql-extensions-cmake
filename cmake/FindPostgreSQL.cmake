@@ -47,6 +47,7 @@ endif(WIN32)
 if(APPLE)
   find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
   set(PostgreSQL_LINK_FLAGS "${PostgreSQL_LINK_FLAGS} -bundle_loader ${_PG_BINARY}")
+  set(PostgreSQL_LIBRARY ${_PG_BINARY})
 endif()
 
 # ----------------------------------------------------------------------------
