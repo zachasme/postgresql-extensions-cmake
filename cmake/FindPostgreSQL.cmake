@@ -67,9 +67,10 @@ if(WIN32)
 endif(WIN32)
 
 # apple fix
+set(PostgreSQL_LDFLAGS "")
 if(APPLE)
   find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
-  #set(PostgreSQL_LDFLAGS "${PostgreSQL_LDFLAGS} -bundle_loader ${_PG_BINARY}")
+  set(PostgreSQL_LDFLAGS "-bundle_loader ${_PG_BINARY}")
 endif()
 
 # ----------------------------------------------------------------------------
