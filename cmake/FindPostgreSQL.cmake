@@ -69,7 +69,7 @@ endif(WIN32)
 # apple fix
 if(APPLE)
   find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
-  set(PostgreSQL_LDFLAGS "${PostgreSQL_LDFLAGS} -bundle_loader ${_PG_BINARY}")
+  #set(PostgreSQL_LDFLAGS "${PostgreSQL_LDFLAGS} -bundle_loader ${_PG_BINARY}")
 endif()
 
 # ----------------------------------------------------------------------------
@@ -200,7 +200,7 @@ if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::PostgreSQL)
   set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
     IMPORTED_LOCATION "${PostgreSQL_LIBRARY}"
     #INTERFACE_COMPILE_OPTIONS "${PostgreSQL_CFLAGS_OTHER}"
-    #INTERFACE_LINK_OPTIONS "${PostgreSQL_LDFLAGS}"
+    INTERFACE_LINK_OPTIONS ${PostgreSQL_LDFLAGS}
     INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}"
   )
 endif()
