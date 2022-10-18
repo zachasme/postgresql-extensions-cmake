@@ -200,8 +200,6 @@ if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::PostgreSQL)
   add_library(PostgreSQL::PostgreSQL UNKNOWN IMPORTED)
   set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
     IMPORTED_LOCATION "${PostgreSQL_LIBRARY}"
-    #INTERFACE_COMPILE_OPTIONS "${PostgreSQL_CFLAGS_OTHER}"
-    INTERFACE_LINK_OPTIONS "${PostgreSQL_LDFLAGS}"
     INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}"
   )
 endif()

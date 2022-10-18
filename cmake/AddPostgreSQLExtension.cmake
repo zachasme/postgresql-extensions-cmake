@@ -19,12 +19,12 @@ function(PostgreSQL_add_extension NAME)
   target_link_libraries(${NAME} PostgreSQL::PostgreSQL)
 
   # fix apple missing symbols
-  #if(APPLE)
-  #  set_target_properties(
-  #    ${NAME}
-  #    PROPERTIES LINK_FLAGS ${PostgreSQL_LDFLAGS}
-  #  )
-  #endif()
+  if(APPLE)
+    set_target_properties(
+      ${NAME}
+      PROPERTIES LINK_FLAGS ${PostgreSQL_LDFLAGS}
+    )
+  endif()
 
   # Final touches on output file
   set_target_properties(${NAME} PROPERTIES
