@@ -100,7 +100,8 @@ PATH_SUFFIXES
   lib
   "PostgreSQL/${FIND_VERSION_MAJOR}/lib"
 )
-message(STATUS PostgreSQL_SERVER_LIBRARY)
+message(STATUS "${PostgreSQL_SERVER_LIBRARY}")
+set(PostgreSQL_LIBRARY ${PostgreSQL_SERVER_LIBRARY})
 
 #                     ------------------------------------
 
