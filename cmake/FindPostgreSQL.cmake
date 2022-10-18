@@ -89,9 +89,18 @@ find_library(PostgreSQL_LIBRARY
   PATHS ${PostgreSQL_LIBRARY_DIRS}
 )
 find_library(PostgreSQL_LIBRARY
-  NAMES libpq
-  PATHS ${PostgreSQL_LIBRARY_DIRS}
+NAMES libpq
+PATHS ${PostgreSQL_LIBRARY_DIRS}
 )
+find_library(PostgreSQL_SERVER_LIBRARY
+NAMES postgres
+PATHS
+  ${PostgreSQL_ROOT_DIRECTORIES}
+PATH_SUFFIXES
+  lib
+  "PostgreSQL/${FIND_VERSION_MAJOR}/lib"
+)
+message(STATUS PostgreSQL_SERVER_LIBRARY)
 
 #                     ------------------------------------
 
