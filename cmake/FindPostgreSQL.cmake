@@ -2,6 +2,7 @@
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#find-modules
 # ----------------------------------------------------------------------------
 
+# Parse the version we are looking for
 string(REPLACE "." ";" PostgreSQL_FIND_VERSION_LIST "${PostgreSQL_FIND_VERSION}")
 list(GET PostgreSQL_FIND_VERSION_LIST 0 PostgreSQL_FIND_VERSION_MAJOR)
 list(GET PostgreSQL_FIND_VERSION_LIST 1 PostgreSQL_FIND_VERSION_MINOR)

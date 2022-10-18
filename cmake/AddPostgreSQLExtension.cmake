@@ -22,7 +22,7 @@ function(PostgreSQL_add_extension NAME)
   if(APPLE)
     set_target_properties(
       ${NAME}
-      PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS}
+      PROPERTIES LINK_FLAGS ${PostgreSQL_LDFLAGS}
     )
   endif()
 
