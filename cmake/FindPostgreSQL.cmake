@@ -84,24 +84,25 @@ endif()
 
 # Now we need to find the libraries and include files; we use the information from pkg-config to provide hints to CMake about where to look.
 
-find_library(PostgreSQL_LIBRARY
-  NAMES pq
-  PATHS ${PostgreSQL_LIBRARY_DIRS}
-)
-find_library(PostgreSQL_LIBRARY
-NAMES libpq
-PATHS ${PostgreSQL_LIBRARY_DIRS}
-)
-find_library(PostgreSQL_SERVER_LIBRARY
-NAMES postgres
-PATHS
-  ${PostgreSQL_ROOT_DIRECTORIES}
-PATH_SUFFIXES
-  lib
-  "PostgreSQL/${FIND_VERSION_MAJOR}/lib"
-)
-message(STATUS "${PostgreSQL_SERVER_LIBRARY}")
-set(PostgreSQL_LIBRARY ${PostgreSQL_SERVER_LIBRARY})
+if(UNIX)
+  find_library(PostgreSQL_LIBRARY
+    NAMES pq
+    PATHS ${PostgreSQL_LIBRARY_DIRS}
+  )
+  find_library(PostgreSQL_LIBRARY
+    NAMES libpq
+    PATHS ${PostgreSQL_LIBRARY_DIRS}
+  )
+elseif(WIN32)
+  find_library(PostgreSQL_LIBRARY
+  NAMES postgres
+  PATHS
+    ${PostgreSQL_ROOT_DIRECTORIES}
+  PATH_SUFFIXES
+    lib
+    "PostgreSQL/${FIND_VERSION_MAJOR}/lib"
+  )
+endif()
 
 #                     ------------------------------------
 
