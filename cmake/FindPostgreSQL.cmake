@@ -39,9 +39,9 @@ list(APPEND PostgreSQL_LIBRARY_DIRS "${PostgreSQL_LIBRARY_DIR}")
 
 # windows fix
 if(WIN32)
-  list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32")
+  list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_SERVER_DIR}/port/win32")
   if(MSVC)
-    list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIRECTORY_SERVER}/port/win32_msvc")
+    list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_SERVER_DIR}/port/win32_msvc")
   endif(MSVC)
 endif(WIN32)
 
