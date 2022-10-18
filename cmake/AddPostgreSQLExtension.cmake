@@ -1,5 +1,3 @@
-set(LINK_LIBRARIES PostgreSQL::PostgreSQL)
-
 # Add pg_regress binary
 find_program(PostgreSQL_REGRESS pg_regress
   HINTS
@@ -12,15 +10,14 @@ function(PostgreSQL_add_extension NAME)
   set(options RELOCATABLE)
   set(oneValueArgs COMMENT)
   set(multiValueArgs SOURCES DATA)
-  cmake_parse_arguments(EXTENSION "${options}" "${oneValueArgs}"
-                        "${multiValueArgs}" ${ARGN} )
+  cmake_parse_arguments(EXTENSION "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   # Add extension as a dynamically linked library
   add_library(${NAME} MODULE ${EXTENSION_SOURCES})
+
   # Link extension to PostgreSQL
-  target_link_libraries(${NAME}
-    ${LINK_LIBRARIES}
-  )
+  target_link_libraries(${NAME} PostgreSQL::PostgreSQL)
+
   # fix apple missing symbols
   if(APPLE)
     set_target_properties(
@@ -28,11 +25,12 @@ function(PostgreSQL_add_extension NAME)
       PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS}
     )
   endif()
-  # Avoid lib* prefix on output file
+
+  # Final touches on output file
   set_target_properties(${NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION TRUE
     #C_VISIBILITY_PRESET hidden # <--- HOW TO GET THIS WORKING?
-    PREFIX ""
+    PREFIX "" # Avoid lib* prefix on output file
   )
 
   # Generate .control file
