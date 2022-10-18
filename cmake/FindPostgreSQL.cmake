@@ -13,20 +13,41 @@ find_program(PG_CONFIG pg_config
   PATHS ${PostgreSQL_ROOT_DIRECTORIES}
   PATH_SUFFIXES bin)
 
+# pkg_check_modules(PC_PostgreSQL)
+# find_package(PkgConfig)
+#
+# This should define some variables starting PC_Foo_ that contain the information from the Foo.pc file.  
+# PC_ ... _FOUND
+# PC_ ... _LIBRARIES
+# PC_ ... _LINK_LIBRARIES
+# PC_ ... _LIBRARY_DIRS
+# PC_ ... _LDFLAGS
+# PC_ ... _LDFLAGS_OTHER
+# PC_ ... _INCLUDE_DIRS
+# PC_ ... _CFLAGS
+# PC_ ... _CFLAGS_OTHER     // required non-include-dir CFLAGS to stdout
+# 
+# singular exports
+# PC_ ... _VERSION
+# PC_ ... _PREFIX
+# PC_ ... _INCLUDEDIR
+# PC_ ... _LIBDIR
+
+  
 execute_process(COMMAND ${PG_CONFIG} --bindir            OUTPUT_VARIABLE PostgreSQL_BIN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --docdir            OUTPUT_VARIABLE PostgreSQL_DOC_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --htmldir           OUTPUT_VARIABLE PostgreSQL_HTML_DIR           OUTPUT_STRIP_TRAILING_WHITESPACE)
+#execute_process(COMMAND ${PG_CONFIG} --docdir            OUTPUT_VARIABLE PostgreSQL_DOC_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+#execute_process(COMMAND ${PG_CONFIG} --htmldir           OUTPUT_VARIABLE PostgreSQL_HTML_DIR           OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --includedir        OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --pkgincludedir     OUTPUT_VARIABLE PostgreSQL_PKGINCLUDE_DIR     OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --includedir-server OUTPUT_VARIABLE PostgreSQL_INCLUDE_SERVER_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIBRARY_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --localedir         OUTPUT_VARIABLE PostgreSQL_LOCALE_DIR         OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --mandir            OUTPUT_VARIABLE PostgreSQL_MAN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+#execute_process(COMMAND ${PG_CONFIG} --localedir         OUTPUT_VARIABLE PostgreSQL_LOCALE_DIR         OUTPUT_STRIP_TRAILING_WHITESPACE)
+#execute_process(COMMAND ${PG_CONFIG} --mandir            OUTPUT_VARIABLE PostgreSQL_MAN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --sharedir          OUTPUT_VARIABLE PostgreSQL_SHARE_DIR          OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --cppflags          OUTPUT_VARIABLE PostgreSQL_CPPFLAGS           OUTPUT_STRIP_TRAILING_WHITESPACE)
+#execute_process(COMMAND ${PG_CONFIG} --cppflags          OUTPUT_VARIABLE PostgreSQL_CPPFLAGS           OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --cflags            OUTPUT_VARIABLE PostgreSQL_CFLAGS             OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --cflags_sl         OUTPUT_VARIABLE PostgreSQL_CFLAGS_SL          OUTPUT_STRIP_TRAILING_WHITESPACE)
+#execute_process(COMMAND ${PG_CONFIG} --cflags_sl         OUTPUT_VARIABLE PostgreSQL_CFLAGS_SL          OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --ldflags           OUTPUT_VARIABLE PostgreSQL_LDFLAGS            OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --ldflags_ex        OUTPUT_VARIABLE PostgreSQL_LDFLAGS_EX         OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --ldflags_sl        OUTPUT_VARIABLE PostgreSQL_LDFLAGS_SL         OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -85,7 +106,7 @@ endif()
 
 set(FIND_LIBRARY pq)
 if(WIN32)
-  set(FIND_LIBRARY postres)
+  set(FIND_LIBRARY postgres)
 endif()
 find_library(PostgreSQL_LIBRARY
   NAMES ${FIND_LIBRARY}
