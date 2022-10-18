@@ -34,7 +34,6 @@ execute_process(COMMAND ${PG_CONFIG} --libs              OUTPUT_VARIABLE Postgre
 execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 string(REPLACE " " ";" PostgreSQL_CFLAGS ${PostgreSQL_CFLAGS})
-string(REPLACE " " ";" PostgreSQL_LDFLAGS ${PostgreSQL_LDFLAGS})
 list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR}" "${PostgreSQL_INCLUDE_SERVER_DIR}")
 list(APPEND PostgreSQL_LIBRARY_DIRS "${PostgreSQL_LIBRARY_DIR}")
 
@@ -49,7 +48,7 @@ endif(WIN32)
 # apple fix
 if(APPLE)
   find_program(_PG_BINARY postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
-  list(APPEND PostgreSQL_LDFLAGS "-bundle_loader ${_PG_BINARY}")
+  set(PostgreSQL_LDFLAGS "${PostgreSQL_LDFLAGS} -bundle_loader ${_PG_BINARY}")
   set(PostgreSQL_LIBRARY ${_PG_BINARY})
 endif()
 
@@ -73,7 +72,7 @@ endif()
 # PC_ ... _LDFLAGS_OTHER
 # PC_ ... _INCLUDE_DIRS
 # PC_ ... _CFLAGS
-# PC_ ... _CFLAGS_OTHER
+# PC_ ... _CFLAGS_OTHER     // required non-include-dir CFLAGS to stdout
 
 # PC_ ... _VERSION
 # PC_ ... _PREFIX
@@ -190,7 +189,7 @@ if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::PostgreSQL)
   set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
     IMPORTED_LOCATION "${PostgreSQL_LIBRARY}"
     #INTERFACE_COMPILE_OPTIONS "${PostgreSQL_CFLAGS_OTHER}"
-    INTERFACE_LINK_OPTIONS "${PostgreSQL_LINK_FLAGS}"
+    #INTERFACE_LINK_OPTIONS "${PostgreSQL_LDFLAGS}"
     INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIRS}"
   )
 endif()
