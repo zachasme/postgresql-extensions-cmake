@@ -38,7 +38,7 @@ execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE Postgre
 
 # Create include dirs list
 # TODO: Figure out if we need _INCLUDE_DIR or _PKG_INCLUDE_DIR
-list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR} ${PostgreSQL_PKG_INCLUDE_DIR}" "${PostgreSQL_SERVER_INCLUDE_DIR}")
+list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR}" "${PostgreSQL_PKG_INCLUDE_DIR}" "${PostgreSQL_SERVER_INCLUDE_DIR}")
 list(APPEND PostgreSQL_LIBRARY_DIRS "${PostgreSQL_LIBRARY_DIR}")
 
 set(FIND_LIBRARY pq)
