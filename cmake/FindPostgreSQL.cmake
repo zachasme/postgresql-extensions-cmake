@@ -2,12 +2,8 @@
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#find-modules
 # ----------------------------------------------------------------------------
 
-# Parse the version we are looking for
-#string(REPLACE "." ";" PostgreSQL_FIND_VERSION_LIST "${PostgreSQL_FIND_VERSION}")
-#list(GET PostgreSQL_FIND_VERSION_LIST 0 PostgreSQL_FIND_VERSION_MAJOR)
-#list(GET PostgreSQL_FIND_VERSION_LIST 1 PostgreSQL_FIND_VERSION_MINOR)
-
 # We will be configuring using pg_config
+# TODO: Use FIND_VERSION to locate specific version of pg_config, right now we are using the first one on $PATH
 find_program(PG_CONFIG pg_config REQUIRED PATHS ${PostgreSQL_ROOT_DIRECTORIES} PATH_SUFFIXES bin)
 
 # Traditional variables (from pkg-config):
@@ -80,7 +76,6 @@ include(SelectLibraryConfigurations)
 select_library_configurations(PostgreSQL)
 
 # ----------------------------------------------------------------------------
-
 # If you have a good way of getting the version (from a header file, for example),
 # you can use that information to set Foo_VERSION (although note that find modules have
 # traditionally used Foo_VERSION_STRING, so you may want to set both).
@@ -91,7 +86,6 @@ list(GET PostgreSQL_VERSION_LIST 1 PostgreSQL_VERSION_MINOR)
 set(PostgreSQL_VERSION "${PostgreSQL_VERSION_MAJOR}.${PostgreSQL_VERSION_MINOR}")
 
 # ----------------------------------------------------------------------------
-
 # Now we can use FindPackageHandleStandardArgs to do
 # most of the rest of the work for us
 include(FindPackageHandleStandardArgs)
@@ -103,7 +97,6 @@ find_package_handle_standard_args(PostgreSQL
 )
 
 # ----------------------------------------------------------------------------
-
 # At this point, we have to provide a way for users of the find module to link to the library or libraries that were found.
 #
 # If the library is available with multiple configurations, the IMPORTED_CONFIGURATIONS target property should also be populated:
