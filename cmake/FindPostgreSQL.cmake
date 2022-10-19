@@ -41,7 +41,7 @@ execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE Postgre
 list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR}" "${PostgreSQL_PKG_INCLUDE_DIR}" "${PostgreSQL_SERVER_INCLUDE_DIR}")
 list(APPEND PostgreSQL_LIBRARY_DIRS "${PostgreSQL_LIBRARY_DIR}")
 
-set(FIND_LIBRARY pq)
+set(FIND_LIBRARY pq) # Note: this is different on WIN32
 
 # Platform fixes: Windows
 # https://wiki.postgresql.org/wiki/Building_and_Installing_PostgreSQL_Extension_Modules
@@ -68,16 +68,12 @@ endif()
 
 find_library(PostgreSQL_LIBRARY_RELEASE
   NAMES ${FIND_LIBRARY}
-  PATHS
-    ${PostgreSQL_LIBRARY_DIRS}
-    "PostgreSQL/${FIND_VERSION_MAJOR}/lib"
+  PATHS ${PostgreSQL_LIBRARY_DIRS}
 )
 
 find_library(PostgreSQL_LIBRARY_DEBUG
   NAMES ${FIND_LIBRARY}d # <-- debug
-  PATHS
-    ${PostgreSQL_LIBRARY_DIRS}
-    "PostgreSQL/${FIND_VERSION_MAJOR}/lib"
+  PATHS ${PostgreSQL_LIBRARY_DIRS}
 )
 
 include(SelectLibraryConfigurations)
