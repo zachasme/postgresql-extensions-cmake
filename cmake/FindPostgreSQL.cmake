@@ -12,33 +12,33 @@ find_program(PG_CONFIG pg_config REQUIRED PATHS ${PostgreSQL_ROOT_DIRECTORIES} P
 
 # Traditional variables (from pkg-config):
 #
-# PC_ ... _FOUND
-# PC_ ... _LIBRARIES
-# PC_ ... _LINK_LIBRARIES
-# PC_ ... _LIBRARY_DIRS
-# PC_ ... _LDFLAGS
-# PC_ ... _LDFLAGS_OTHER
-# PC_ ... _INCLUDE_DIRS
-# PC_ ... _CFLAGS
-# PC_ ... _CFLAGS_OTHER     // required non-include-dir CFLAGS to stdout
+# _FOUND            has the package been found
+# _LIBRARIES        ?
+# _LINK_LIBRARIES   ?
+# _LIBRARY_DIRS     ?
+# _LDFLAGS          ?
+# _LDFLAGS_OTHER    ?
+# _INCLUDE_DIRS     ?
+# _CFLAGS           ?
+# _CFLAGS_OTHER     required non-include-dir CFLAGS to stdout
 # 
-# PC_ ... _VERSION
-# PC_ ... _PREFIX
-# PC_ ... _INCLUDEDIR
-# PC_ ... _LIBDIR
+# _VERSION          full version of found package
+# _PREFIX           ?
+# _INCLUDEDIR       ?
+# _LIBDIR           ?
 
+execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --bindir            OUTPUT_VARIABLE PostgreSQL_BIN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --sharedir          OUTPUT_VARIABLE PostgreSQL_SHARE_DIR          OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --includedir        OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --pkgincludedir     OUTPUT_VARIABLE PostgreSQL_PKGINCLUDE_DIR     OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --includedir-server OUTPUT_VARIABLE PostgreSQL_INCLUDE_SERVER_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --pkgincludedir     OUTPUT_VARIABLE PostgreSQL_PKG_INCLUDE_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PG_CONFIG} --includedir-server OUTPUT_VARIABLE PostgreSQL_SERVER_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIBRARY_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
-#execute_process(COMMAND ${PG_CONFIG} --mandir            OUTPUT_VARIABLE PostgreSQL_MAN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --sharedir          OUTPUT_VARIABLE PostgreSQL_SHARE_DIR          OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Create include dirs list
-list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR}" "${PostgreSQL_INCLUDE_SERVER_DIR}")
+# TODO: Figure out if we need _INCLUDE_DIR or _PKG_INCLUDE_DIR
+list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR} ${PostgreSQL_PKG_INCLUDE_DIR}" "${PostgreSQL_SERVER_INCLUDE_DIR}")
 list(APPEND PostgreSQL_LIBRARY_DIRS "${PostgreSQL_LIBRARY_DIR}")
 
 set(FIND_LIBRARY pq)
@@ -47,9 +47,9 @@ set(FIND_LIBRARY pq)
 # https://wiki.postgresql.org/wiki/Building_and_Installing_PostgreSQL_Extension_Modules
 if(WIN32)
   set(FIND_LIBRARY postgres)
-  list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_SERVER_DIR}/port/win32")
+  list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_SERVER_INCLUDE_DIR}/port/win32")
   if(MSVC)
-    list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_SERVER_DIR}/port/win32_msvc")
+    list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_SERVER_INCLUDE_DIR}/port/win32_msvc")
   endif(MSVC)
 endif(WIN32)
 
