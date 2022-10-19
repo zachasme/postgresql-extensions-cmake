@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------------
 
 # Parse the version we are looking for
-string(REPLACE "." ";" PostgreSQL_FIND_VERSION_LIST "${PostgreSQL_FIND_VERSION}")
-list(GET PostgreSQL_FIND_VERSION_LIST 0 PostgreSQL_FIND_VERSION_MAJOR)
-list(GET PostgreSQL_FIND_VERSION_LIST 1 PostgreSQL_FIND_VERSION_MINOR)
+#string(REPLACE "." ";" PostgreSQL_FIND_VERSION_LIST "${PostgreSQL_FIND_VERSION}")
+#list(GET PostgreSQL_FIND_VERSION_LIST 0 PostgreSQL_FIND_VERSION_MAJOR)
+#list(GET PostgreSQL_FIND_VERSION_LIST 1 PostgreSQL_FIND_VERSION_MINOR)
 
 # We will be configuring using pg_config
 find_program(PG_CONFIG pg_config REQUIRED PATHS ${PostgreSQL_ROOT_DIRECTORIES} PATH_SUFFIXES bin)
