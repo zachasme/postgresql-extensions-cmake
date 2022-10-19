@@ -53,6 +53,7 @@ endif(WIN32)
 # https://github.com/postgres/postgres/blob/master/src/makefiles/Makefile.darwin
 set(PostgreSQL_LDFLAGS "")
 if(APPLE)
+  # TODO: Find out if the cannot be done in a more cmakey way
   find_program(PostgreSQL_EXECUTABLE postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
   set(PostgreSQL_LDFLAGS "-bundle_loader ${PostgreSQL_EXECUTABLE}")
 endif()
