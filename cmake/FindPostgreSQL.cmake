@@ -2,27 +2,13 @@
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#find-modules
 # ----------------------------------------------------------------------------
 
-# We will be configuring using pg_config
-# TODO: Use FIND_VERSION to locate specific version of pg_config, right now we are using the first one on $PATH
+# @TODO: Use `FIND_VERSION` to locate specific version of pg_config,
+#         right now we are using the first (if any) found on $PATH
+
+# Configuration will be based on values gathered from `pg_config`
 find_program(PG_CONFIG pg_config REQUIRED PATHS ${PostgreSQL_ROOT_DIRECTORIES} PATH_SUFFIXES bin)
 
-# Traditional variables (from pkg-config):
-#
-# _FOUND            has the package been found
-# _LIBRARIES        ?
-# _LINK_LIBRARIES   ?
-# _LIBRARY_DIRS     ?
-# _LDFLAGS          ?
-# _LDFLAGS_OTHER    ?
-# _INCLUDE_DIRS     ?
-# _CFLAGS           ?
-# _CFLAGS_OTHER     required non-include-dir CFLAGS to stdout
-# 
-# _VERSION          full version of found package
-# _PREFIX           ?
-# _INCLUDEDIR       ?
-# _LIBDIR           ?
-
+# Grab information about the installed version of PostgreSQL
 execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --bindir            OUTPUT_VARIABLE PostgreSQL_BIN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --sharedir          OUTPUT_VARIABLE PostgreSQL_SHARE_DIR          OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -32,12 +18,14 @@ execute_process(COMMAND ${PG_CONFIG} --includedir-server OUTPUT_VARIABLE Postgre
 execute_process(COMMAND ${PG_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIBRARY_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+# @TODO: Figure out if we need _INCLUDE_DIR and/or _PKG_INCLUDE_DIR
+
 # Create include dirs list
-# TODO: Figure out if we need _INCLUDE_DIR or _PKG_INCLUDE_DIR
 list(APPEND PostgreSQL_INCLUDE_DIRS "${PostgreSQL_INCLUDE_DIR}" "${PostgreSQL_PKG_INCLUDE_DIR}" "${PostgreSQL_SERVER_INCLUDE_DIR}")
 list(APPEND PostgreSQL_LIBRARY_DIRS "${PostgreSQL_LIBRARY_DIR}")
 
-set(FIND_LIBRARY pq) # Note: this is different on WIN32
+# Set library to search for (which is different on WIN32)
+set(FIND_LIBRARY pq)
 
 # Platform fixes: Windows
 # https://wiki.postgresql.org/wiki/Building_and_Installing_PostgreSQL_Extension_Modules
@@ -51,17 +39,19 @@ endif(WIN32)
 
 # Platform fixes: MacOS
 # https://github.com/postgres/postgres/blob/master/src/makefiles/Makefile.darwin
-set(PostgreSQL_LDFLAGS "")
+set(PostgreSQL_LINK_FLAGS "")
+# @TODO: Find out if the cannot be done in a more cmakey way
 if(APPLE)
-  # TODO: Find out if the cannot be done in a more cmakey way
   find_program(PostgreSQL_EXECUTABLE postgres REQUIRED NO_DEFAULT_PATH PATHS ${PostgreSQL_BIN_DIR})
-  set(PostgreSQL_LDFLAGS "-bundle_loader ${PostgreSQL_EXECUTABLE}")
+  set(PostgreSQL_LINK_FLAGS "-bundle_loader ${PostgreSQL_EXECUTABLE}")
 endif()
 
 # ----------------------------------------------------------------------------
 # Now we need to find the libraries and include files
 # if the library is available with multiple configurations, you can use SelectLibraryConfigurations
 # to automatically set the _LIBRARY variable:
+
+# @TODO: Find out if we can actually find any debug libraries on each platform
 
 find_library(PostgreSQL_LIBRARY_RELEASE
   NAMES ${FIND_LIBRARY}
@@ -143,6 +133,23 @@ mark_as_advanced(
 )
 
 # ----------------------------------------------------------------------------
+
+# Traditional variables (from pkg-config):
+#
+# _FOUND            has the package been found
+# _LIBRARIES        ?
+# _LINK_LIBRARIES   ?
+# _LIBRARY_DIRS     ?
+# _LDFLAGS          ?
+# _LDFLAGS_OTHER    ?
+# _INCLUDE_DIRS     ?
+# _CFLAGS           ?
+# _CFLAGS_OTHER     required non-include-dir CFLAGS to stdout
+# 
+# _VERSION          full version of found package
+# _PREFIX           ?
+# _INCLUDEDIR       ?
+# _LIBDIR           ?
 
 # debug
 message(STATUS "Find version:  ${PostgreSQL_FIND_VERSION}")

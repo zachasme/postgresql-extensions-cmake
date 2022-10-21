@@ -20,7 +20,7 @@ function(PostgreSQL_add_extension NAME)
 
   # fix apple missing symbols
   if(APPLE)
-    set_target_properties(${NAME} PROPERTIES LINK_FLAGS ${PostgreSQL_LDFLAGS})
+    set_target_properties(${NAME} PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS})
   endif()
 
   # Final touches on output file
