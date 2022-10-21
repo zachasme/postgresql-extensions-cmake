@@ -32,7 +32,7 @@ function(PostgreSQL_add_extension NAME)
 
   # Generate .control file
   configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/FindPostgreSQL/control.in
+    ${CMAKE_SOURCE_DIR}/cmake/control.in
     ${NAME}.control
   )
 
