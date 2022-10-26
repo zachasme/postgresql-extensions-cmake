@@ -6,6 +6,7 @@ PostgreSQL_add_extension(dependant
   DATA
     dependant--1.0.0.sql
 )
+
 target_include_directories(dependant
   PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
@@ -24,5 +25,11 @@ if(BUILD_TESTING AND PostgreSQL_REGRESS)
       --outputdir=${CMAKE_CURRENT_BINARY_DIR}
       --load-extension dependant
       test1
+  )
+
+  add_test(
+    NAME dependant_inlined
+    COMMAND sh -c "! objdump -D ${PostgreSQL_PKG_LIBRARY_DIR}/dependant.so | grep radsToDegs"
+    CONFIGURATIONS Release
   )
 endif()

@@ -3,9 +3,9 @@ rm -rf build
 mkdir build
 
 # Build and install
-     cmake -B        build
-     cmake --build   build --config Release -- VERBOSE=1
-sudo cmake --install build --config Release --component Unspecified
+     cmake -B        build -DCMAKE_BUILD_TYPE=Release 
+     cmake --build   build -- VERBOSE=1
+sudo cmake --install build --component Unspecified
 
 # Run tests
 pushd build
