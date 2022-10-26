@@ -12,23 +12,28 @@ function(PostgreSQL_add_extension NAME)
   set(multiValueArgs SOURCES DATA)
   cmake_parse_arguments(EXTENSION "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-  # Add extension as a dynamically linked library
-  add_library(${NAME} MODULE ${EXTENSION_SOURCES})
+  if(EXTENSION_SOURCES)
+    # Add extension as a dynamically linked library
+    add_library(${NAME} MODULE ${EXTENSION_SOURCES})
 
-  # Link extension to PostgreSQL
-  target_link_libraries(${NAME} PostgreSQL::PostgreSQL)
+    # Link extension to PostgreSQL
+    target_link_libraries(${NAME} PostgreSQL::PostgreSQL)
 
-  # fix apple missing symbols
-  if(APPLE)
-    set_target_properties(${NAME} PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS})
+    # fix apple missing symbols
+    if(APPLE)
+      set_target_properties(${NAME} PROPERTIES LINK_FLAGS ${PostgreSQL_LINK_FLAGS})
+    endif()
+
+    # Final touches on output file
+    set_target_properties(${NAME} PROPERTIES
+      INTERPROCEDURAL_OPTIMIZATION TRUE
+      #C_VISIBILITY_PRESET hidden # @TODO: how to get this working?
+      PREFIX "" # Avoid lib* prefix on output file
+    )
+
+    # Install .so/.dll to pkglib-dir
+    install(TARGETS ${NAME} LIBRARY DESTINATION "${PostgreSQL_PKG_LIBRARY_DIR}")
   endif()
-
-  # Final touches on output file
-  set_target_properties(${NAME} PROPERTIES
-    INTERPROCEDURAL_OPTIMIZATION TRUE
-    #C_VISIBILITY_PRESET hidden # <--- HOW TO GET THIS WORKING?
-    PREFIX "" # Avoid lib* prefix on output file
-  )
 
   # Generate .control file
   configure_file(
@@ -36,8 +41,6 @@ function(PostgreSQL_add_extension NAME)
     ${NAME}.control
   )
 
-  # Install .so/.dll to pkglib-dir
-  install(TARGETS ${NAME} LIBRARY DESTINATION "${PostgreSQL_PKG_LIBRARY_DIR}")
   # Install everything else into share-dir
   install(
     FILES

@@ -10,9 +10,6 @@ set(ENABLE_FORMAT     OFF)
 set(ENABLE_LINTING    OFF)
 set(ENABLE_DOCS       OFF)
 
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fwrapv")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mpc64")
-
 FetchContent_Declare(
   h3
   URL      https://github.com/uber/h3/archive/refs/tags/v4.0.1.tar.gz
@@ -22,7 +19,6 @@ FetchContent_MakeAvailable(h3)
 
 set_target_properties(h3 PROPERTIES
   INTERPROCEDURAL_OPTIMIZATION TRUE
-  POSITION_INDEPENDENT_CODE    ON
   C_VISIBILITY_PRESET          hidden
 )
 

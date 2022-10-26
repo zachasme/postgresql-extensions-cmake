@@ -1,0 +1,6 @@
+SELECT onlysql(1, 2);
+ onlysql 
+---------
+       3
+(1 row)
+
