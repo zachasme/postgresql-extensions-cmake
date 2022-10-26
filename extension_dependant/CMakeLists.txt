@@ -4,7 +4,7 @@ PostgreSQL_add_extension(postgresql_dependant
   COMMENT "A PostgreSQL extension with dependencies"
   SOURCES
     dependant.c
-  DATA
+  INSTALLS
     dependant--1.0.0.sql
 )
 

@@ -8,8 +8,8 @@ find_program(PostgreSQL_REGRESS pg_regress
 # Helper command to add extensions
 function(PostgreSQL_add_extension LIBRARY_NAME)
   set(options RELOCATABLE)
-  set(oneValueArgs NAME COMMENT)
-  set(multiValueArgs SOURCES DATA)
+  set(oneValueArgs NAME COMMENT COMPONENT)
+  set(multiValueArgs SOURCES INSTALLS UPDATES)
   cmake_parse_arguments(EXTENSION "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   # Default extension name to same as library name
@@ -39,7 +39,11 @@ function(PostgreSQL_add_extension LIBRARY_NAME)
     )
 
     # Install .so/.dll to pkglib-dir
-    install(TARGETS ${LIBRARY_NAME} LIBRARY DESTINATION "${PostgreSQL_PKG_LIBRARY_DIR}")
+    install(
+      TARGETS ${LIBRARY_NAME}
+      LIBRARY DESTINATION "${PostgreSQL_PKG_LIBRARY_DIR}"
+      COMPONENT ${COMPONENT}
+    )
   endif()
 
   # Generate .control file
@@ -48,11 +52,20 @@ function(PostgreSQL_add_extension LIBRARY_NAME)
     ${EXTENSION_NAME}.control
   )
 
+  # Generate .sql install file
+  set(EXTENSION_INSTALL ${CMAKE_CURRENT_BINARY_DIR}/${EXTENSION_NAME}--${PROJECT_VERSION}.sql)
+  foreach(file ${EXTENSION_INSTALLS})
+    file(READ ${file} CONTENTS)
+    file(APPEND ${EXTENSION_INSTALL} "${CONTENTS}")
+  endforeach()
+
   # Install everything else into share-dir
   install(
     FILES
       ${CMAKE_CURRENT_BINARY_DIR}/${EXTENSION_NAME}.control
-      ${EXTENSION_DATA}
+      ${EXTENSION_INSTALL}
+      ${EXTENSION_UPDATES}
     DESTINATION "${PostgreSQL_SHARE_DIR}/extension"
+    COMPONENT ${COMPONENT}
   )
 endfunction()

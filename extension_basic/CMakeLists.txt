@@ -3,8 +3,10 @@ PostgreSQL_add_extension(basic
   COMMENT "A basic PostgreSQL extension"
   SOURCES
     basic.c
-  DATA
+  INSTALLS
     basic--1.0.0.sql
+  UPDATES
+    basic--1.0.0--2.0.0.sql
 )
 
 # Test your extension

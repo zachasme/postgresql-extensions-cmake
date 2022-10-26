@@ -1,7 +1,7 @@
 PostgreSQL_add_extension(onlysql
   RELOCATABLE
   COMMENT "A PostgreSQL extension with dependencies"
-  DATA
+  INSTALLS
     onlysql--1.0.0.sql
 )
 
