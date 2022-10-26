@@ -28,6 +28,7 @@ if(BUILD_TESTING)
     add_test(
       NAME basic_validate_extupgrade
       COMMAND ${PostgreSQL_VALIDATE_EXTUPGRADE}
+        --host /var/run/postgresql
         --extname basic
         --from 1.0.0
         --to 2.0.0
