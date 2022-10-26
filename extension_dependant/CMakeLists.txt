@@ -1,4 +1,5 @@
-PostgreSQL_add_extension(dependant
+PostgreSQL_add_extension(postgresql_dependant
+  NAME dependant
   RELOCATABLE
   COMMENT "A PostgreSQL extension with dependencies"
   SOURCES
@@ -7,12 +8,12 @@ PostgreSQL_add_extension(dependant
     dependant--1.0.0.sql
 )
 
-target_include_directories(dependant
+target_include_directories(postgresql_dependant
   PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 # link dependencies
 add_subdirectory(dependencies)
-target_link_libraries(dependant h3)
+target_link_libraries(postgresql_dependant h3)
 
 # Test your extension
 if(BUILD_TESTING AND PostgreSQL_REGRESS)
