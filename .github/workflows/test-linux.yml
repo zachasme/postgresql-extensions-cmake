@@ -13,7 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install PostgreSQL server headers
+      - name: Install pg_validate_extupgrade
+        run: cargo install --locked --git https://github.com/rjuju/pg_validate_extupgrade.git
+
+      - name: Install PostgreSQL server dependencies
         run: sudo apt install postgresql-server-dev-14 postgis
 
       - name: Generate
@@ -25,5 +28,13 @@ jobs:
       - name: Install
         run: sudo cmake --install build
 
+      - name: Prepare PostgreSQL
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres -i createuser --superuser runner
+          sudo -u postgres -i createdb runner
+
       - name: Test
+        env:
+          PGHOST: /var/run/postgresql
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
