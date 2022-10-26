@@ -5,6 +5,9 @@ find_program(PostgreSQL_REGRESS pg_regress
     "${PostgreSQL_BIN_DIR}"
 )
 
+# Add pg_validate_extupgrade binary
+find_program(PostgreSQL_VALIDATE_EXTUPGRADE pg_validate_extupgrade)
+
 # Helper command to add extensions
 function(PostgreSQL_add_extension LIBRARY_NAME)
   set(options RELOCATABLE)
