@@ -33,4 +33,4 @@ jobs:
         if: ${{ failure() }}
         with:
           name: test
-          path: build
+          path: build/*/test

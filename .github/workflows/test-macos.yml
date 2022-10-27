@@ -33,9 +33,9 @@ jobs:
 
       - name: Prepare PostgreSQL
         run: |
-          brew services start postgresql
-          # sudo -u postgres -i createuser --superuser runner
-          # sudo -u postgres -i createdb runner
+          brew services start postgresql@14
+          sudo -u postgres -i createuser --superuser runner
+          sudo -u postgres -i createdb runner
 
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
@@ -45,4 +45,4 @@ jobs:
         if: ${{ failure() }}
         with:
           name: test
-          path: build
+          path: build/*/test
