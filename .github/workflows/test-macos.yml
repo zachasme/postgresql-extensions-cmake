@@ -19,8 +19,8 @@ jobs:
           path: ~/.cargo
           key: ${{ runner.os }}-cargo-2022
 
-      - name: Install pg_validate_extupgrade
-        run: cargo install --locked --git https://github.com/rjuju/pg_validate_extupgrade.git
+      #- name: Install pg_validate_extupgrade
+      #  run: cargo install --locked --git https://github.com/rjuju/pg_validate_extupgrade.git
 
       - name: Generate
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.config }}
@@ -33,7 +33,7 @@ jobs:
 
       - name: Prepare PostgreSQL
         run: |
-          postgres -D /usr/local/var/postgres
+          pg_ctl start --wait
           sudo createuser --superuser runner
           sudo createdb runner
 
