@@ -27,3 +27,10 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
+
+      - name: Archive test output
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: test
+          path: build
