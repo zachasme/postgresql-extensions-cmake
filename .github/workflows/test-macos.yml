@@ -33,6 +33,8 @@ jobs:
 
       - name: Prepare PostgreSQL
         run: |
+          brew services start postgresql@14
+          brew services info postgresql@14
           pg_ctl start -D /usr/local/share/postgres@14 --wait
           sudo createuser --superuser runner
           sudo createdb runner
