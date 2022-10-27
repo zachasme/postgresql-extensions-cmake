@@ -34,10 +34,9 @@ jobs:
       - name: Prepare PostgreSQL
         run: |
           brew services start postgresql@14
-          pg_lsclusters
-          pg_ctl start -D /usr/local/share/postgres@14 --wait
-          sudo createuser --superuser runner
-          sudo createdb runner
+          pg_config
+          createuser --superuser runner
+          createdb runner
 
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
