@@ -27,3 +27,7 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
+
+      - name: Print regression diffs
+        if: ${{ failure() }}
+        run: cat build/*/regression.diffs /build/*/log/postmaster.log
