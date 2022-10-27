@@ -32,7 +32,9 @@ jobs:
         run: sudo cmake --install build --config ${{ matrix.config }}
 
       - name: Prepare PostgreSQL
-        run: pg_ctl start -D /usr/local/var/postgresql@14 --wait
+        run: |
+          pg_ctl start -D /usr/local/var/postgresql@14 --wait
+          createdb runner
 
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
