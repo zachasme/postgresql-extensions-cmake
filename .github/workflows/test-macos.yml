@@ -20,7 +20,7 @@ jobs:
           key: ${{ runner.os }}-cargo-2022
 
       - name: Install pg_validate_extupgrade
-       run: cargo install --locked --git https://github.com/rjuju/pg_validate_extupgrade.git
+        run: cargo install --locked --git https://github.com/rjuju/pg_validate_extupgrade.git
 
       - name: Generate
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.config }}
@@ -34,6 +34,7 @@ jobs:
       - name: Prepare PostgreSQL
         run: |
           brew services start postgresql@14
+          #pg_ctl start -D /usr/local/var/postgresql@14 --wait
 
           echo "Check PostgreSQL service is running"
           i=20
