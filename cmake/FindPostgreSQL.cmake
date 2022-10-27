@@ -8,6 +8,10 @@
 set(PostgreSQL_KNOWN_VERSIONS ${PostgreSQL_ADDITIONAL_VERSIONS}
   "14" "13" "12" "11" "10" "9.6" "9.5" "9.4" "9.3" "9.2" "9.1" "9.0" "8.4" "8.3" "8.2" "8.1" "8.0")
 
+if(FIND_VERSION)
+  list(PREPEND PostgreSQL_KNOWN_VERSIONS "${FIND_VERSION}")
+endif()
+
 foreach(suffix ${PostgreSQL_KNOWN_VERSIONS})
   if(WIN32)
     list(APPEND PostgreSQL_CONFIG_PATH_SUFFIXES
