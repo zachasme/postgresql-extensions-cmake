@@ -28,9 +28,6 @@ jobs:
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
 
-      - name: Archive test output
-        uses: actions/upload-artifact@v3
+      - name: Print regression diffs
         if: ${{ failure() }}
-        with:
-          name: test
-          path: build/*/regression.diffs
+        run: cat build/*/regression.diffs
