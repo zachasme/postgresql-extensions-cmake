@@ -5,8 +5,22 @@
 # @TODO: Use `FIND_VERSION` to locate specific version of pg_config,
 #         right now we are using the first (if any) found on $PATH
 
+set(PostgreSQL_KNOWN_VERSIONS ${PostgreSQL_ADDITIONAL_VERSIONS}
+  "14" "13" "12" "11" "10" "9.6" "9.5" "9.4" "9.3" "9.2" "9.1" "9.0" "8.4" "8.3" "8.2" "8.1" "8.0")
+
+foreach(suffix ${PostgreSQL_KNOWN_VERSIONS})
+  if(WIN32)
+    list(APPEND PostgreSQL_CONFIG_ADDITIONAL_SEARCH_SUFFIXES
+      "PostgreSQL/${suffix}/bin")
+  endif()
+endforeach()
+
 # Configuration will be based on values gathered from `pg_config`
-find_program(PG_CONFIG pg_config REQUIRED PATHS ${PostgreSQL_ROOT_DIRECTORIES} PATH_SUFFIXES bin)
+find_program(PG_CONFIG pg_config REQUIRED
+  PATH_SUFFIXES
+    ${PostgreSQL_CONFIG_ADDITIONAL_SEARCH_SUFFIXES}
+    bin
+)
 
 # Grab information about the installed version of PostgreSQL
 execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
