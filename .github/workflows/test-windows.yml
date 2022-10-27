@@ -30,4 +30,4 @@ jobs:
 
       - name: Print regression diffs
         if: ${{ failure() }}
-        run: cat build/*/regression.diffs
+        run: cat build/*/regression.diffs /build/*/log/postmaster.log

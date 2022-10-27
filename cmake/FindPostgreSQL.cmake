@@ -2,9 +2,7 @@
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#find-modules
 # ----------------------------------------------------------------------------
 
-# @TODO: Use `FIND_VERSION` to locate specific version of pg_config,
-#         right now we are using the first (if any) found on $PATH
-
+# Use `FIND_VERSION` to locate specific version of pg_config, or fallback to known versions
 set(PostgreSQL_KNOWN_VERSIONS ${PostgreSQL_ADDITIONAL_VERSIONS}
   "14" "13" "12" "11" "10" "9.6" "9.5" "9.4" "9.3" "9.2" "9.1" "9.0" "8.4" "8.3" "8.2" "8.1" "8.0")
 
