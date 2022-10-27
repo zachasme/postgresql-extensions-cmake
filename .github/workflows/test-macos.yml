@@ -50,10 +50,11 @@ jobs:
               sleep 3
           done
 
-          psql -c 'SELECT 1;'
-          psql -c 'SHOW data_directory;'
           createuser --superuser runner
           createdb runner
+
+          psql -c 'SELECT 1;'
+          psql -c 'SHOW data_directory;'
 
       - name: Test
         run: ctest --test-dir build --output-on-failure --build-config ${{ matrix.config }}
