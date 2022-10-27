@@ -33,7 +33,7 @@ jobs:
 
       - name: Prepare PostgreSQL
         run: |
-          pg_ctl start --wait
+          pg_ctl start -D /usr/local/var/postgres --wait
           sudo createuser --superuser runner
           sudo createdb runner
 
