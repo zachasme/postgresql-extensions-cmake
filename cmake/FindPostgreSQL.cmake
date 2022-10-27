@@ -10,27 +10,30 @@ set(PostgreSQL_KNOWN_VERSIONS ${PostgreSQL_ADDITIONAL_VERSIONS}
 
 foreach(suffix ${PostgreSQL_KNOWN_VERSIONS})
   if(WIN32)
-    list(APPEND PostgreSQL_CONFIG_ADDITIONAL_SEARCH_SUFFIXES
+    list(APPEND PostgreSQL_CONFIG_PATH_SUFFIXES
       "PostgreSQL/${suffix}/bin")
+  endif()
+  if(UNIX)
+    list(APPEND PostgreSQL_CONFIG_PATH_SUFFIXES
+      "bin")
   endif()
 endforeach()
 
 # Configuration will be based on values gathered from `pg_config`
-find_program(PG_CONFIG pg_config REQUIRED
+find_program(PostgreSQL_CONFIG pg_config REQUIRED
   PATH_SUFFIXES
-    ${PostgreSQL_CONFIG_ADDITIONAL_SEARCH_SUFFIXES}
-    bin
+    ${PostgreSQL_CONFIG_PATH_SUFFIXES}
 )
 
 # Grab information about the installed version of PostgreSQL
-execute_process(COMMAND ${PG_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --bindir            OUTPUT_VARIABLE PostgreSQL_BIN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --sharedir          OUTPUT_VARIABLE PostgreSQL_SHARE_DIR          OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --includedir        OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --pkgincludedir     OUTPUT_VARIABLE PostgreSQL_PKG_INCLUDE_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --includedir-server OUTPUT_VARIABLE PostgreSQL_SERVER_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIBRARY_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${PG_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PostgreSQL_CONFIG} --version           OUTPUT_VARIABLE PostgreSQL_VERSION            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PostgreSQL_CONFIG} --bindir            OUTPUT_VARIABLE PostgreSQL_BIN_DIR            OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PostgreSQL_CONFIG} --sharedir          OUTPUT_VARIABLE PostgreSQL_SHARE_DIR          OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PostgreSQL_CONFIG} --includedir        OUTPUT_VARIABLE PostgreSQL_INCLUDE_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PostgreSQL_CONFIG} --pkgincludedir     OUTPUT_VARIABLE PostgreSQL_PKG_INCLUDE_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PostgreSQL_CONFIG} --includedir-server OUTPUT_VARIABLE PostgreSQL_SERVER_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PostgreSQL_CONFIG} --libdir            OUTPUT_VARIABLE PostgreSQL_LIBRARY_DIR        OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PostgreSQL_CONFIG} --pkglibdir         OUTPUT_VARIABLE PostgreSQL_PKG_LIBRARY_DIR    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # @TODO: Figure out if we need _INCLUDE_DIR and/or _PKG_INCLUDE_DIR
 

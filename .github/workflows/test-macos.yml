@@ -41,7 +41,4 @@ jobs:
 
       - name: Print regression diffs
         if: ${{ failure() }}
-        run: |
-          cat /usr/local/var/log/postgres.log 2>/dev/null
-          cat /usr/var/log/postgres.log 2>/dev/null
-          cat build/*/regression.diffs 2>/dev/null
+        run: cat build/*/regression.diffs
