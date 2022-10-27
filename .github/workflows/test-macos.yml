@@ -50,7 +50,7 @@ jobs:
               sleep 3
           done
 
-          createuser --superuser runner
+          #createuser --superuser runner
           createdb runner
 
           psql -c 'SELECT 1;'
